@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام إدارة وجرد السوبر ماركت الذكي</title>
+    <title>نظام إدارة وجرد السوبر ماركت </title>
     
     <!-- 🎨 جميع تنسيقات الـ CSS مدمجة بالكامل -->
     <style>
@@ -225,6 +225,33 @@
 
         .form-group input:focus, .form-group select:focus {
             border-color: var(--primary-color);
+        }
+
+        .unit-input-wrapper {
+            display: flex;
+            gap: 8px;
+        }
+
+        .unit-input-wrapper input {
+            flex: 1;
+        }
+
+        .btn-add-unit {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--accent-color);
+            border: 1px solid var(--accent-color);
+            border-radius: 10px;
+            padding: 0 12px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: bold;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+
+        .btn-add-unit:hover {
+            background: var(--accent-color);
+            color: white;
         }
 
         .btn {
@@ -470,6 +497,11 @@
 
         <!-- ================= الشاشات الداخلية ================= -->
 
+        <!-- القائمة المنسدلة المقترحة للوحدات -->
+        <datalist id="units-list">
+            <!-- تتعبأ ديناميكياً بوسطة JS -->
+        </datalist>
+
         <!-- الزر 1: صفحة إضافة المنتجات -->
         <div id="add-product-page" class="page-view active">
             <div class="page-header">
@@ -491,12 +523,10 @@
                     </div>
                     <div class="form-group">
                         <label>الوحدة</label>
-                        <select id="p-unit">
-                            <option value="قطعة">قطعة</option>
-                            <option value="كيلو">كيلو</option>
-                            <option value="علبة">علبة</option>
-                            <option value="كرتونة">كرتونة</option>
-                        </select>
+                        <div class="unit-input-wrapper">
+                            <input type="text" id="p-unit" list="units-list" placeholder="اختر أو اكتب وحدة..." required>
+                            <button type="button" class="btn-add-unit" onclick="promptAddNewUnit()">+ وحدة جديدة</button>
+                        </div>
                     </div>
                     <div class="form-group">
                         <label>الكمية الأولية بالمخزن</label>
@@ -569,7 +599,7 @@
     <div id="edit-modal" class="modal-overlay">
         <div class="modal-card">
             <div class="modal-header">
-                <h3>✏️ تعديل بياتات المنتج</h3>
+                <h3>✏️ تعديل بيانات المنتج</h3>
                 <button class="close-btn" onclick="closeEditModal()">&times;</button>
             </div>
             <form id="edit-product-form">
@@ -589,12 +619,9 @@
                     </div>
                     <div class="form-group">
                         <label>الوحدة</label>
-                        <select id="edit-p-unit">
-                            <option value="قطعة">قطعة</option>
-                            <option value="كيلو">كيلو</option>
-                            <option value="علبة">علبة</option>
-                            <option value="كرتونة">كرتونة</option>
-                        </select>
+                        <div class="unit-input-wrapper">
+                            <input type="text" id="edit-p-unit" list="units-list" required>
+                        </div>
                     </div>
                     <div class="form-group">
                         <label>الكمية بالمخزن</label>
@@ -614,6 +641,49 @@
         const DB_NAME = 'SupermarketDB';
         const DB_VERSION = 1;
         let db = null;
+
+        // إدارة قائمة الوحدات الدائمة في localStorage
+        const DEFAULT_UNITS = ['قطعة', 'كيلو', 'علبة', 'كرتونة', 'لتر', 'جرام', 'كيس'];
+
+        function getStoredUnits() {
+            const stored = localStorage.getItem('supermarket_units');
+            if (stored) {
+                return JSON.parse(stored);
+            }
+            localStorage.setItem('supermarket_units', JSON.stringify(DEFAULT_UNITS));
+            return DEFAULT_UNITS;
+        }
+
+        function saveUnitIfNew(newUnit) {
+            if (!newUnit) return;
+            const units = getStoredUnits();
+            const trimmedUnit = newUnit.trim();
+            if (trimmedUnit && !units.includes(trimmedUnit)) {
+                units.push(trimmedUnit);
+                localStorage.setItem('supermarket_units', JSON.stringify(units));
+                renderUnitsDatalist();
+            }
+        }
+
+        function renderUnitsDatalist() {
+            const datalist = document.getElementById('units-list');
+            if (!datalist) return;
+            const units = getStoredUnits();
+            datalist.innerHTML = '';
+            units.forEach(unit => {
+                const opt = document.createElement('option');
+                opt.value = unit;
+                datalist.appendChild(opt);
+            });
+        }
+
+        function promptAddNewUnit() {
+            const newUnit = prompt('أدخل اسم الوحدة الجديدة (مثال: طرد، شريط، لفة):');
+            if (newUnit && newUnit.trim()) {
+                saveUnitIfNew(newUnit.trim());
+                document.getElementById('p-unit').value = newUnit.trim();
+            }
+        }
 
         // تهيئة قاعدة البيانات أوفلاين
         function initDB() {
@@ -690,6 +760,7 @@
 
         // تشغيل النظام
         document.addEventListener('DOMContentLoaded', async () => {
+            renderUnitsDatalist();
             await initDB();
             setupNavigation();
             updateDashboardStats();
@@ -740,18 +811,22 @@
             const name = document.getElementById('p-name').value.trim();
             const category = document.getElementById('p-category').value.trim();
             const price = parseFloat(document.getElementById('p-price').value);
-            const unit = document.getElementById('p-unit').value;
+            const unit = document.getElementById('p-unit').value.trim();
             const quantity = parseFloat(document.getElementById('p-qty').value) || 0;
 
-            if (!name || !category || isNaN(price)) {
+            if (!name || !category || isNaN(price) || !unit) {
                 alert('برجاء ملء كافة الحقول الأساسية بشكل صحيح');
                 return;
             }
+
+            // حفظ الوحدة تلقائياً إذا كانت جيدة
+            saveUnitIfNew(unit);
 
             const newProduct = { name, category, price, unit, quantity, createdAt: new Date().toISOString() };
             await addProductToDB(newProduct);
             alert('تم حفظ المنتج بنجاح في قاعدة البيانات!');
             document.getElementById('product-form').reset();
+            document.getElementById('p-qty').value = 1;
             updateDashboardStats();
         });
 
@@ -810,8 +885,15 @@
             const name = document.getElementById('edit-p-name').value.trim();
             const category = document.getElementById('edit-p-category').value.trim();
             const price = parseFloat(document.getElementById('edit-p-price').value);
-            const unit = document.getElementById('edit-p-unit').value;
+            const unit = document.getElementById('edit-p-unit').value.trim();
             const quantity = parseFloat(document.getElementById('edit-p-qty').value) || 0;
+
+            if (!unit) {
+                alert('برجاء تحديد الوحدة');
+                return;
+            }
+
+            saveUnitIfNew(unit);
 
             const updatedProduct = { id, name, category, price, unit, quantity, updatedAt: new Date().toISOString() };
 
@@ -828,6 +910,17 @@
                 renderInventoryTable();
                 updateDashboardStats();
             }
+        }
+
+        // إعادة ضبط نموذج الجرد والحاسبة
+        function resetStocktakingForm() {
+            selectedProduct = null;
+            if (searchInput) searchInput.value = '';
+            if (resultsBox) resultsBox.style.display = 'none';
+            const calcDetails = document.getElementById('calc-details');
+            if (calcDetails) calcDetails.style.display = 'none';
+            const stQty = document.getElementById('st-qty');
+            if (stQty) stQty.value = 1;
         }
 
         // حاسبة الجرد والبحث السريع
@@ -881,16 +974,6 @@
             const qty = parseFloat(document.getElementById('st-qty').value) || 0;
             const total = qty * selectedProduct.price;
             document.getElementById('st-total-price').textContent = total.toFixed(2) + ' ج.م';
-        }
-
-        function resetStocktakingForm() {
-            selectedProduct = null;
-            if (searchInput) searchInput.value = '';
-            if (resultsBox) resultsBox.style.display = 'none';
-            const calcDetails = document.getElementById('calc-details');
-            if (calcDetails) calcDetails.style.display = 'none';
-            const stQty = document.getElementById('st-qty');
-            if (stQty) stQty.value = '1';
         }
     </script>
 </body>
