@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام إدارة وجرد السوبر ماركت الذكي</title>
+    
+    <!-- 🎨 جميع تنسيقات الـ CSS مدمجة بالكامل -->
+    <style>
+        :root {
+            --primary-color: #10b981;
+            --primary-hover: #059669;
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-color: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+            --accent-color: #3b82f6;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            direction: rtl;
+            min-height: 100vh;
+            padding-bottom: 3rem;
+        }
+
+        /* الهيدر وشريط التنقل */
+        .navbar {
+            background-color: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .offline-badge {
+            background-color: rgba(16, 185, 129, 0.15);
+            color: var(--primary-color);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            border: 1px solid var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+
+        /* كروت الإحصائيات العلويّة */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            border-right: 5px solid var(--primary-color);
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.2);
+            transition: transform 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .stat-card h4 {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+        }
+
+        .stat-card div {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--text-color);
+        }
+
+        /* أزرار الداشبورد والتنقل بين الصفحات */
+        .nav-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .nav-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-card:hover, .nav-card.active-tab {
+            transform: translateY(-4px);
+            border-color: var(--primary-color);
+            box-shadow: 0 10px 20px -5px rgba(16, 185, 129, 0.2);
+            background: #243347;
+        }
+
+        .nav-icon {
+            width: 55px;
+            height: 55px;
+            border-radius: 12px;
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            flex-shrink: 0;
+        }
+
+        .nav-info h3 {
+            font-size: 1.1rem;
+            margin-bottom: 4px;
+            color: var(--text-color);
+        }
+
+        .nav-info p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        /* الشاشات الداخلية */
+        .page-view {
+            display: none;
+            background: var(--card-bg);
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            padding: 2rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .page-view.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .page-header {
+            margin-bottom: 1.8rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .page-header h2 {
+            font-size: 1.4rem;
+            color: var(--primary-color);
+        }
+
+        /* النماذج ومدخلات البيانات */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.25rem;
+            margin-bottom: 1.8rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+
+        .form-group label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .form-group input, .form-group select {
+            padding: 0.8rem 1rem;
+            background: #0f172a;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            outline: none;
+            font-size: 0.95rem;
+            color: var(--text-color);
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            border-color: var(--primary-color);
+        }
+
+        .btn {
+            padding: 0.85rem 1.8rem;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: #0f172a;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+        }
+
+        .btn-edit {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--warning-color);
+            border: 1px solid var(--warning-color);
+            padding: 0.4rem 0.8rem;
+            font-size: 0.9rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-left: 5px;
+        }
+
+        .btn-edit:hover {
+            background: var(--warning-color);
+            color: #0f172a;
+        }
+
+        .btn-danger {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--danger-color);
+            border: 1px solid var(--danger-color);
+            padding: 0.4rem 0.8rem;
+            font-size: 0.9rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-danger:hover {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        /* الجداول */
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            text-align: right;
+        }
+
+        th, td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: #0f172a;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .actions-cell {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* النافذة المنبثقة للتعديل (Modal) */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+            animation: modalIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.8rem;
+        }
+
+        .modal-header h3 {
+            color: var(--warning-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .close-btn:hover {
+            color: var(--text-color);
+        }
+
+        /* بحث الجرد وحاسبة السلع */
+        .search-results {
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+            position: absolute;
+            background: #0f172a;
+            width: 100%;
+            z-index: 20;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.5);
+            margin-top: 5px;
+        }
+
+        .search-item {
+            padding: 12px 16px;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border-color);
+            transition: background 0.2s;
+        }
+
+        .search-item:hover {
+            background-color: var(--card-bg);
+            color: var(--primary-color);
+        }
+
+        .calc-card {
+            background: #0f172a;
+            padding: 1.8rem;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            margin-top: 1.5rem;
+        }
+
+        .calc-card p {
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- الهيدر واللوجو -->
+    <nav class="navbar">
+        <div class="logo">
+            🛒 <span>سوبر ماركت</span>
+        </div>
+        <div class="offline-badge">
+            ● أوفلاين (شغال بدون إنترنت)
+        </div>
+    </nav>
+
+    <div class="container">
+        
+        <!-- إحصائيات الداشبورد -->
+        <div class="stats-row">
+            <div class="stat-card">
+                <h4>إجمالي المنتجات المسجلة</h4>
+                <div id="stat-total-products">0</div>
+            </div>
+            <div class="stat-card">
+                <h4>عدد الأصناف / التصنيفات</h4>
+                <div id="stat-total-categories">0</div>
+            </div>
+            <div class="stat-card">
+                <h4>إجمالي قيمة المخزون</h4>
+                <div id="stat-total-value">0.00 ج.م</div>
+            </div>
+        </div>
+
+        <!-- أزرار الداشبورد الرئيسية (3 أزرار للتنقل) -->
+        <div class="nav-grid">
+            <div class="nav-card active-tab" data-page="add-product-page">
+                <div class="nav-icon">➕</div>
+                <div class="nav-info">
+                    <h3> إضافة المنتجات</h3>
+                    <p>إدخال سلعة جديدة، سعرها، وتصنيفها</p>
+                </div>
+            </div>
+
+            <div class="nav-card" data-page="inventory-page">
+                <div class="nav-icon">📦</div>
+                <div class="nav-info">
+                    <h3> عرض المخزن</h3>
+                    <p>عرض شامل لكافة السلع، الكميات، والأصناف</p>
+                </div>
+            </div>
+
+            <div class="nav-card" data-page="stocktaking-page">
+                <div class="nav-icon">🧮</div>
+                <div class="nav-info">
+                    <h3>الجرد والحاسبة</h3>
+                    <p>جرد نصف يدوي سريع وحساب التكلفة</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= الشاشات الداخلية ================= -->
+
+        <!-- الزر 1: صفحة إضافة المنتجات -->
+        <div id="add-product-page" class="page-view active">
+            <div class="page-header">
+                <h2>إضافة منتج جديد للمخزن</h2>
+            </div>
+            <form id="product-form">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>اسم المنتج</label>
+                        <input type="text" id="p-name" placeholder="مثال: جبنة لافاش كيري" required>
+                    </div>
+                    <div class="form-group">
+                        <label>التصنيف</label>
+                        <input type="text" id="p-category" placeholder="مثال: ألبان وأجبان" required>
+                    </div>
+                    <div class="form-group">
+                        <label>السعر (ج.م)</label>
+                        <input type="number" step="0.01" id="p-price" placeholder="0.00" required>
+                    </div>
+                    <div class="form-group">
+                        <label>الوحدة</label>
+                        <select id="p-unit">
+                            <option value="قطعة">قطعة</option>
+                            <option value="كيلو">كيلو</option>
+                            <option value="علبة">علبة</option>
+                            <option value="كرتونة">كرتونة</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>الكمية الأولية بالمخزن</label>
+                        <input type="number" id="p-qty" placeholder="0" value="1">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">حفظ المنتج بداخل قاعدة البيانات</button>
+            </form>
+        </div>
+
+        <!-- الزر 2: صفحة عرض المخزن -->
+        <div id="inventory-page" class="page-view">
+            <div class="page-header">
+                <h2>جدول سلع المخزن المسجلة</h2>
+            </div>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>اسم المنتج</th>
+                            <th>التصنيف</th>
+                            <th>السعر</th>
+                            <th>الكمية المتاحة</th>
+                            <th>الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="inventory-tbody">
+                        <!-- يتم تحميل بيانات المنتجات هنا عبر JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- الزر 3: صفحة الجرد النصف يدوي والحاسبة -->
+        <div id="stocktaking-page" class="page-view">
+            <div class="page-header">
+                <h2>شاشة الجرد النصف يدوي والحاسبة</h2>
+            </div>
+            
+            <div style="position: relative; max-width: 500px; margin-bottom: 1.5rem;">
+                <label style="font-weight: bold; display: block; margin-bottom: 0.5rem; color: var(--text-muted);">ابحث عن السلعة للجرد:</label>
+                <input type="text" id="st-search" placeholder="اكتب اسم السلعة للبحث السريع..." style="width: 100%; padding: 0.85rem; border-radius: 10px; border: 1px solid var(--border-color); background: #0f172a; color: white;">
+                <div id="st-results" class="search-results" style="display: none;"></div>
+            </div>
+
+            <div id="calc-details" class="calc-card" style="display: none;">
+                <h3 style="color: var(--primary-color); margin-bottom: 1rem;">تفاصيل السلعة المحددة:</h3>
+                <p><strong>اسم السلعة:</strong> <span id="st-selected-name" style="color: var(--primary-color);">-</span></p>
+                <p><strong>التصنيف:</strong> <span id="st-selected-cat">-</span></p>
+                <p><strong>السعر للوحدة:</strong> <span id="st-selected-price">-</span></p>
+                
+                <hr style="margin: 1.2rem 0; border: none; border-top: 1px solid var(--border-color);">
+
+                <div class="form-group" style="max-width: 300px;">
+                    <label>أدخل الكمية التي تم جردها الآن:</label>
+                    <input type="number" id="st-qty" placeholder="أدخل الكمية..." min="0" value="1">
+                </div>
+
+                <div style="margin-top: 1.5rem; background: var(--card-bg); padding: 1.2rem; border-radius: 10px; border-right: 5px solid var(--primary-color);">
+                    <h4 style="color: var(--text-muted); font-size: 0.9rem;">إجمالي قيمة هذه السلعة للكمية المحددة:</h4>
+                    <div id="st-total-price" style="font-size: 2rem; font-weight: bold; color: var(--primary-color); margin-top: 5px;">0.00 ج.م</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ✏️ النافذة المنبثقة لتعديل المنتج (Edit Modal) -->
+    <div id="edit-modal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>✏️ تعديل بياتات المنتج</h3>
+                <button class="close-btn" onclick="closeEditModal()">&times;</button>
+            </div>
+            <form id="edit-product-form">
+                <input type="hidden" id="edit-p-id">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>اسم المنتج</label>
+                        <input type="text" id="edit-p-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>التصنيف</label>
+                        <input type="text" id="edit-p-category" required>
+                    </div>
+                    <div class="form-group">
+                        <label>السعر (ج.م)</label>
+                        <input type="number" step="0.01" id="edit-p-price" required>
+                    </div>
+                    <div class="form-group">
+                        <label>الوحدة</label>
+                        <select id="edit-p-unit">
+                            <option value="قطعة">قطعة</option>
+                            <option value="كيلو">كيلو</option>
+                            <option value="علبة">علبة</option>
+                            <option value="كرتونة">كرتونة</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>الكمية بالمخزن</label>
+                        <input type="number" id="edit-p-qty" required>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 1rem;">
+                    <button type="button" class="btn btn-danger" onclick="closeEditModal()">إلغاء</button>
+                    <button type="submit" class="btn btn-primary" style="background: var(--warning-color); color: #0f172a;">حفظ التعديلات</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ⚡ أكواد البرمجة وقاعدة البيانات (IndexedDB) مدمجة بالكامل -->
+    <script>
+        const DB_NAME = 'SupermarketDB';
+        const DB_VERSION = 1;
+        let db = null;
+
+        // تهيئة قاعدة البيانات أوفلاين
+        function initDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME, DB_VERSION);
+
+                request.onupgradeneeded = (e) => {
+                    const database = e.target.result;
+                    if (!database.objectStoreNames.contains('products')) {
+                        const store = database.createObjectStore('products', { keyPath: 'id', autoIncrement: true });
+                        store.createIndex('name', 'name', { unique: false });
+                        store.createIndex('category', 'category', { unique: false });
+                    }
+                };
+
+                request.onsuccess = (e) => {
+                    db = e.target.result;
+                    resolve(db);
+                };
+
+                request.onerror = (e) => reject('خطأ في قاعدة البيانات المحلية: ' + e.target.error);
+            });
+        }
+
+        function addProductToDB(product) {
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction('products', 'readwrite');
+                const store = tx.objectStore('products');
+                const req = store.add(product);
+                req.onsuccess = () => resolve(req.result);
+                req.onerror = () => reject(req.error);
+            });
+        }
+
+        function getAllProductsFromDB() {
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction('products', 'readonly');
+                const store = tx.objectStore('products');
+                const req = store.getAll();
+                req.onsuccess = () => resolve(req.result);
+                req.onerror = () => reject(req.error);
+            });
+        }
+
+        function getProductFromDB(id) {
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction('products', 'readonly');
+                const store = tx.objectStore('products');
+                const req = store.get(id);
+                req.onsuccess = () => resolve(req.result);
+                req.onerror = () => reject(req.error);
+            });
+        }
+
+        function updateProductInDB(product) {
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction('products', 'readwrite');
+                const store = tx.objectStore('products');
+                const req = store.put(product);
+                req.onsuccess = () => resolve(true);
+                req.onerror = () => reject(req.error);
+            });
+        }
+
+        function deleteProductFromDB(id) {
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction('products', 'readwrite');
+                const store = tx.objectStore('products');
+                const req = store.delete(id);
+                req.onsuccess = () => resolve(true);
+                req.onerror = () => reject(req.error);
+            });
+        }
+
+        // تشغيل النظام
+        document.addEventListener('DOMContentLoaded', async () => {
+            await initDB();
+            setupNavigation();
+            updateDashboardStats();
+        });
+
+        // إدارة التنقل بين الصفحات والأزرار
+        function setupNavigation() {
+            const navCards = document.querySelectorAll('.nav-card');
+            const pageViews = document.querySelectorAll('.page-view');
+
+            navCards.forEach(card => {
+                card.addEventListener('click', () => {
+                    const targetPage = card.getAttribute('data-page');
+
+                    navCards.forEach(c => c.classList.remove('active-tab'));
+                    card.classList.add('active-tab');
+
+                    pageViews.forEach(page => {
+                        page.classList.remove('active');
+                        if (page.id === targetPage) {
+                            page.classList.add('active');
+                        }
+                    });
+
+                    if (targetPage === 'inventory-page') {
+                        renderInventoryTable();
+                    } else if (targetPage === 'stocktaking-page') {
+                        resetStocktakingForm();
+                    }
+                });
+            });
+        }
+
+        // تحديث إحصائيات الداشبورد
+        async function updateDashboardStats() {
+            const products = await getAllProductsFromDB();
+            document.getElementById('stat-total-products').textContent = products.length;
+            const categories = new Set(products.map(p => p.category));
+            document.getElementById('stat-total-categories').textContent = categories.size;
+            const totalValue = products.reduce((acc, p) => acc + (p.price * p.quantity), 0);
+            document.getElementById('stat-total-value').textContent = totalValue.toFixed(2) + ' ج.م';
+        }
+
+        // حفظ المنتج الجديد
+        document.getElementById('product-form')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const name = document.getElementById('p-name').value.trim();
+            const category = document.getElementById('p-category').value.trim();
+            const price = parseFloat(document.getElementById('p-price').value);
+            const unit = document.getElementById('p-unit').value;
+            const quantity = parseFloat(document.getElementById('p-qty').value) || 0;
+
+            if (!name || !category || isNaN(price)) {
+                alert('برجاء ملء كافة الحقول الأساسية بشكل صحيح');
+                return;
+            }
+
+            const newProduct = { name, category, price, unit, quantity, createdAt: new Date().toISOString() };
+            await addProductToDB(newProduct);
+            alert('تم حفظ المنتج بنجاح في قاعدة البيانات!');
+            document.getElementById('product-form').reset();
+            updateDashboardStats();
+        });
+
+        // عرض جدول المخزن
+        async function renderInventoryTable() {
+            const tbody = document.getElementById('inventory-tbody');
+            tbody.innerHTML = '';
+            const products = await getAllProductsFromDB();
+
+            if (products.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted);">لا توجد منتجات مسجلة بالمخزن حالياً. قم بإضافة منتج من الشاشة الأولى.</td></tr>`;
+                return;
+            }
+
+            products.forEach((p, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td><strong>${p.name}</strong></td>
+                    <td><span style="background: rgba(16, 185, 129, 0.1); color: var(--primary-color); padding: 3px 10px; border-radius: 12px; font-size: 0.85rem;">${p.category}</span></td>
+                    <td>${p.price.toFixed(2)} ج.م</td>
+                    <td>${p.quantity} ${p.unit}</td>
+                    <td class="actions-cell">
+                        <button class="btn-edit" onclick="openEditModal(${p.id})" title="تعديل السلعة">✏️ تعديل</button>
+                        <button class="btn-danger" onclick="removeProduct(${p.id})" title="حذف السلعة">🗑️ حذف</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // ✏️ فتح شاشة التعديل وتعبئة البيانات
+        async function openEditModal(id) {
+            const product = await getProductFromDB(id);
+            if (!product) return;
+
+            document.getElementById('edit-p-id').value = product.id;
+            document.getElementById('edit-p-name').value = product.name;
+            document.getElementById('edit-p-category').value = product.category;
+            document.getElementById('edit-p-price').value = product.price;
+            document.getElementById('edit-p-unit').value = product.unit;
+            document.getElementById('edit-p-qty').value = product.quantity;
+
+            document.getElementById('edit-modal').classList.add('active');
+        }
+
+        function closeEditModal() {
+            document.getElementById('edit-modal').classList.remove('active');
+        }
+
+        // حفظ التعديلات
+        document.getElementById('edit-product-form')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const id = parseInt(document.getElementById('edit-p-id').value);
+            const name = document.getElementById('edit-p-name').value.trim();
+            const category = document.getElementById('edit-p-category').value.trim();
+            const price = parseFloat(document.getElementById('edit-p-price').value);
+            const unit = document.getElementById('edit-p-unit').value;
+            const quantity = parseFloat(document.getElementById('edit-p-qty').value) || 0;
+
+            const updatedProduct = { id, name, category, price, unit, quantity, updatedAt: new Date().toISOString() };
+
+            await updateProductInDB(updatedProduct);
+            closeEditModal();
+            renderInventoryTable();
+            updateDashboardStats();
+            alert('تم تعديل بيانات المنتج بنجاح! ✨');
+        });
+
+        async function removeProduct(id) {
+            if (confirm('هل أنت متأكد من حذف هذا المنتج نهائياً؟')) {
+                await deleteProductFromDB(id);
+                renderInventoryTable();
+                updateDashboardStats();
+            }
+        }
+
+        // حاسبة الجرد والبحث السريع
+        let selectedProduct = null;
+        const searchInput = document.getElementById('st-search');
+        const resultsBox = document.getElementById('st-results');
+
+        searchInput?.addEventListener('input', async (e) => {
+            const query = e.target.value.trim().toLowerCase();
+            resultsBox.innerHTML = '';
+
+            if (!query) {
+                resultsBox.style.display = 'none';
+                return;
+            }
+
+            const products = await getAllProductsFromDB();
+            const filtered = products.filter(p => p.name.toLowerCase().includes(query));
+
+            if (filtered.length > 0) {
+                resultsBox.style.display = 'block';
+                filtered.forEach(p => {
+                    const div = document.createElement('div');
+                    div.className = 'search-item';
+                    div.textContent = `${p.name} - [${p.category}] - ${p.price} ج.م`;
+                    div.onclick = () => selectProductForCalc(p);
+                    resultsBox.appendChild(div);
+                });
+            } else {
+                resultsBox.style.display = 'none';
+            }
+        });
+
+        function selectProductForCalc(product) {
+            selectedProduct = product;
+            searchInput.value = product.name;
+            resultsBox.style.display = 'none';
+
+            document.getElementById('st-selected-name').textContent = product.name;
+            document.getElementById('st-selected-cat').textContent = product.category;
+            document.getElementById('st-selected-price').textContent = product.price.toFixed(2) + ' ج.م';
+            
+            document.getElementById('calc-details').style.display = 'block';
+            calculateTotal();
+        }
+
+        document.getElementById('st-qty')?.addEventListener('input', calculateTotal);
+
+        function calculateTotal() {
+            if (!selectedProduct) return;
+            const qty = parseFloat(document.getElementById('st-qty').value) || 0;
+            const total = qty * selectedProduct.price;
+            document.getElementById('st-total-price').textContent = total.toFixed(2) + ' ج.م';
+        }
+
+        function resetStocktakingForm() {
+            selectedProduct = null;
+            if (searchInput) searchInput.value = '';
+            if (resultsBox) resultsBox.style.display = 'none';
+            const calcDetails = document.getElementById('calc-details');
+            if (calcDetails) calcDetails.style.display = 'none';
+            const stQty = document.getElementById('st-qty');
+            if (stQty) stQty.value = '1';
+        }
+    </script>
+</body>
+</html>
