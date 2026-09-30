@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام إدارة وجرد السوبر ماركت</title>
+    <title>نظام إدارة وجرد السوبر ماركت الذكي</title>
     
-    <!-- 🎨 جميع تنسيقات الـ CSS مدمجة بالكامل -->
     <style>
         :root {
             --primary-color: #10b981;
@@ -35,7 +34,6 @@
             padding-bottom: 3rem;
         }
 
-        /* الهيدر وشريط التنقل */
         .navbar {
             background-color: var(--card-bg);
             border-bottom: 1px solid var(--border-color);
@@ -65,9 +63,6 @@
             border-radius: 20px;
             font-size: 0.85rem;
             border: 1px solid var(--primary-color);
-            display: flex;
-            align-items: center;
-            gap: 6px;
         }
 
         .container {
@@ -76,7 +71,6 @@
             padding: 0 1.5rem;
         }
 
-        /* كروت الإحصائيات العلويّة */
         .stats-row {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -91,11 +85,6 @@
             border: 1px solid var(--border-color);
             border-right: 5px solid var(--primary-color);
             box-shadow: 0 4px 6px -1px rgba(0,0,0,0.2);
-            transition: transform 0.2s;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-3px);
         }
 
         .stat-card h4 {
@@ -107,10 +96,8 @@
         .stat-card div {
             font-size: 1.8rem;
             font-weight: bold;
-            color: var(--text-color);
         }
 
-        /* أزرار الداشبورد والتنقل بين الصفحات */
         .nav-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -150,18 +137,9 @@
             flex-shrink: 0;
         }
 
-        .nav-info h3 {
-            font-size: 1.1rem;
-            margin-bottom: 4px;
-            color: var(--text-color);
-        }
+        .nav-info h3 { font-size: 1.1rem; margin-bottom: 4px; }
+        .nav-info p { font-size: 0.85rem; color: var(--text-muted); }
 
-        .nav-info p {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-        }
-
-        /* الشاشات الداخلية */
         .page-view {
             display: none;
             background: var(--card-bg);
@@ -169,17 +147,9 @@
             border: 1px solid var(--border-color);
             padding: 2rem;
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
-            animation: fadeIn 0.3s ease-in-out;
         }
 
-        .page-view.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(8px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        .page-view.active { display: block; }
 
         .page-header {
             margin-bottom: 1.8rem;
@@ -187,12 +157,8 @@
             border-bottom: 1px solid var(--border-color);
         }
 
-        .page-header h2 {
-            font-size: 1.4rem;
-            color: var(--primary-color);
-        }
+        .page-header h2 { font-size: 1.4rem; color: var(--primary-color); }
 
-        /* النماذج ومدخلات البيانات */
         .form-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -220,21 +186,12 @@
             outline: none;
             font-size: 0.95rem;
             color: var(--text-color);
-            transition: border-color 0.2s;
         }
 
-        .form-group input:focus, .form-group select:focus {
-            border-color: var(--primary-color);
-        }
+        .form-group input:focus { border-color: var(--primary-color); }
 
-        .unit-input-wrapper {
-            display: flex;
-            gap: 8px;
-        }
-
-        .unit-input-wrapper input {
-            flex: 1;
-        }
+        .unit-input-wrapper { display: flex; gap: 8px; }
+        .unit-input-wrapper input { flex: 1; }
 
         .btn-add-unit {
             background: rgba(59, 130, 246, 0.15);
@@ -246,12 +203,19 @@
             font-size: 0.85rem;
             font-weight: bold;
             white-space: nowrap;
-            transition: all 0.2s;
         }
 
-        .btn-add-unit:hover {
-            background: var(--accent-color);
-            color: white;
+        .btn-add-unit:hover { background: var(--accent-color); color: white; }
+
+        .calculated-box {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px dashed var(--accent-color);
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
 
         .btn {
@@ -264,14 +228,8 @@
             transition: all 0.2s;
         }
 
-        .btn-primary {
-            background: var(--primary-color);
-            color: #0f172a;
-        }
-
-        .btn-primary:hover {
-            background: var(--primary-hover);
-        }
+        .btn-primary { background: var(--primary-color); color: #0f172a; }
+        .btn-primary:hover { background: var(--primary-hover); }
 
         .btn-edit {
             background: rgba(245, 158, 11, 0.15);
@@ -281,13 +239,7 @@
             font-size: 0.9rem;
             border-radius: 8px;
             cursor: pointer;
-            transition: all 0.2s;
             margin-left: 5px;
-        }
-
-        .btn-edit:hover {
-            background: var(--warning-color);
-            color: #0f172a;
         }
 
         .btn-danger {
@@ -298,70 +250,28 @@
             font-size: 0.9rem;
             border-radius: 8px;
             cursor: pointer;
-            transition: all 0.2s;
         }
 
-        .btn-danger:hover {
-            background: var(--danger-color);
-            color: white;
-        }
-
-        /* الجداول */
-        .table-responsive {
-            overflow-x: auto;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 1rem;
-            text-align: right;
-        }
-
-        th, td {
-            padding: 1rem;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        th {
-            background-color: #0f172a;
-            color: var(--text-muted);
-            font-weight: 600;
-        }
+        .table-responsive { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; margin-top: 1rem; text-align: right; }
+        th, td { padding: 1rem; border-bottom: 1px solid var(--border-color); }
+        th { background-color: #0f172a; color: var(--text-muted); }
 
         .price-badge {
             display: inline-block;
             padding: 4px 8px;
             border-radius: 6px;
             font-weight: bold;
+            font-size: 0.85rem;
         }
 
-        .price-unit {
-            background: rgba(59, 130, 246, 0.15);
-            color: var(--accent-color);
-            border: 1px solid rgba(59, 130, 246, 0.3);
-        }
+        .price-unit { background: rgba(59, 130, 246, 0.15); color: var(--accent-color); }
+        .price-piece { background: rgba(245, 158, 11, 0.15); color: var(--warning-color); }
 
-        .price-total {
-            background: rgba(16, 185, 129, 0.15);
-            color: var(--primary-color);
-            border: 1px solid rgba(16, 185, 129, 0.3);
-        }
-
-        .actions-cell {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        /* النافذة المنبثقة للتعديل (Modal) */
         .modal-overlay {
             display: none;
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(15, 23, 42, 0.8);
             backdrop-filter: blur(4px);
             z-index: 1000;
@@ -369,9 +279,7 @@
             align-items: center;
         }
 
-        .modal-overlay.active {
-            display: flex;
-        }
+        .modal-overlay.active { display: flex; }
 
         .modal-card {
             background: var(--card-bg);
@@ -379,14 +287,7 @@
             border-radius: 16px;
             padding: 2rem;
             width: 90%;
-            max-width: 600px;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
-            animation: modalIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        @keyframes modalIn {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
+            max-width: 650px;
         }
 
         .modal-header {
@@ -398,26 +299,8 @@
             padding-bottom: 0.8rem;
         }
 
-        .modal-header h3 {
-            color: var(--warning-color);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+        .close-btn { background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; }
 
-        .close-btn {
-            background: none;
-            border: none;
-            color: var(--text-muted);
-            font-size: 1.5rem;
-            cursor: pointer;
-        }
-
-        .close-btn:hover {
-            color: var(--text-color);
-        }
-
-        /* بحث الجرد وحاسبة السلع */
         .search-results {
             border: 1px solid var(--border-color);
             border-radius: 10px;
@@ -427,7 +310,6 @@
             background: #0f172a;
             width: 100%;
             z-index: 20;
-            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.5);
             margin-top: 5px;
         }
 
@@ -435,13 +317,9 @@
             padding: 12px 16px;
             cursor: pointer;
             border-bottom: 1px solid var(--border-color);
-            transition: background 0.2s;
         }
 
-        .search-item:hover {
-            background-color: var(--card-bg);
-            color: var(--primary-color);
-        }
+        .search-item:hover { background-color: var(--card-bg); color: var(--primary-color); }
 
         .calc-card {
             background: #0f172a;
@@ -450,23 +328,15 @@
             border: 1px solid var(--border-color);
             margin-top: 1.5rem;
         }
-
-        .calc-card p {
-            margin-bottom: 8px;
-            font-size: 1rem;
-        }
     </style>
 </head>
 <body>
 
-    <!-- الهيدر واللوجو -->
     <nav class="navbar">
         <div class="logo">
-            🛒 <span>سوبر ماركت</span>
+            🛒 <span>سوبر ماركت الذكي</span>
         </div>
-        <div class="offline-badge">
-            ● أوفلاين (شغال بدون إنترنت)
-        </div>
+        <div class="offline-badge">● أوفلاين (شغال بدون إنترنت)</div>
     </nav>
 
     <div class="container">
@@ -478,7 +348,7 @@
                 <div id="stat-total-products">0</div>
             </div>
             <div class="stat-card">
-                <h4>عدد الأصناف / التصنيفات</h4>
+                <h4>عدد الأصناف</h4>
                 <div id="stat-total-categories">0</div>
             </div>
             <div class="stat-card">
@@ -487,13 +357,13 @@
             </div>
         </div>
 
-        <!-- أزرار الداشبورد الرئيسية (3 أزرار للتنقل) -->
+        <!-- أزرار التنقل الرئيسية -->
         <div class="nav-grid">
             <div class="nav-card active-tab" data-page="add-product-page">
                 <div class="nav-icon">➕</div>
                 <div class="nav-info">
                     <h3> إدخال سلعة جديدة</h3>
-                    <p>تسجيل الاسم، التصنيف، السعر، والكمية</p>
+                    <p>تسجيل الاسم، السعر الكلي، والوحدة بالقطع</p>
                 </div>
             </div>
 
@@ -501,25 +371,25 @@
                 <div class="nav-icon">📦</div>
                 <div class="nav-info">
                     <h3> عرض المخزن</h3>
-                    <p>عرض سعر السلعة والكمية الكلية وإجمالي السعر</p>
+                    <p>عرض سعر الكرتونة، سعر القطعة، والكميات</p>
                 </div>
             </div>
 
             <div class="nav-card" data-page="stocktaking-page">
                 <div class="nav-icon">🧮</div>
                 <div class="nav-info">
-                    <h3>الجرد والحاسبة</h3>
-                    <p>جرد نصف يدوي سريع وحساب التكلفة</p>
+                    <h3>الجرد الحسابي المزدوج</h3>
+                    <p>جرد بالـ (باكتة + قطعة) مع الحساب الفوري</p>
                 </div>
             </div>
         </div>
 
-        <!-- القائمة المنسدلة المقترحة للوحدات -->
+        <!-- قائمة المقترحات المسبقة للوحدات -->
         <datalist id="units-list">
-            <!-- تتعبأ ديناميكياً بواسطة JS -->
+            <!-- تتعبأ بـ JS -->
         </datalist>
 
-        <!-- الزر 1: صفحة إضافة المنتجات -->
+        <!-- 1. صفحة إضافة المنتجات -->
         <div id="add-product-page" class="page-view active">
             <div class="page-header">
                 <h2>إضافة منتج جديد للمخزن</h2>
@@ -528,36 +398,49 @@
                 <div class="form-grid">
                     <div class="form-group">
                         <label>اسم المنتج</label>
-                        <input type="text" id="p-name" placeholder="مثال: جبنة لافاش كيري" required>
+                        <input type="text" id="p-name" placeholder="مثال: كوكاكولا كانز" required>
                     </div>
                     <div class="form-group">
                         <label>التصنيف</label>
-                        <input type="text" id="p-category" placeholder="مثال: ألبان وأجبان" required>
+                        <input type="text" id="p-category" placeholder="مثال: مياه غازية" required>
                     </div>
                     <div class="form-group">
-                        <label>السعر (ج.م)</label>
-                        <input type="number" step="0.01" id="p-price" placeholder="0.00" required>
-                    </div>                  
-                    <div class="form-group">
-                        <label>الكمية بالمخزن</label>
-                        <input type="number" id="p-qty" placeholder="مثال: 10" value="1" min="0" required>
+                        <label>سعر العبوة الكلي (ج.م)</label>
+                        <input type="number" step="0.01" id="p-price" placeholder="مثال: 240 (سعر الكرتونة)" required>
                     </div>
                     <div class="form-group">
-                        <label>نوع الوحدة</label>
+                        <label>الوحدة (مع تحديد عدد القطع)</label>
                         <div class="unit-input-wrapper">
-                            <input type="text" id="p-unit" list="units-list" placeholder="اختر أو اكتب وحدة (كرتونة، باكتة، قطعة...)" required>
-                            <button type="button" class="btn-add-unit" onclick="promptAddNewUnit('p-unit')">+ وحدة جديدة</button>
+                            <input type="text" id="p-unit" list="units-list" placeholder="مثال: كرتونة 24 ق / باكتة 12" required>
+                            <button type="button" class="btn-add-unit" onclick="promptAddNewUnit('p-unit')">+ وحدة</button>
                         </div>
                     </div>
+                    <div class="form-group">
+                        <label>الكمية بالمخزن (بالعبوات)</label>
+                        <input type="number" id="p-qty" placeholder="مثال: 10" value="1" min="0" required>
+                    </div>
                 </div>
+
+                <!-- شريط الحساب التلقائي لمعاينة سعر القطعة -->
+                <div class="calculated-box" id="calc-preview" style="display: none;">
+                    <div>
+                        <span style="color: var(--text-muted); font-size: 0.9rem;">العدد المستخرج بداخل العبوة:</span>
+                        <strong id="preview-count" style="color: var(--accent-color); margin-right: 5px;">1</strong> قطعة
+                    </div>
+                    <div>
+                        <span style="color: var(--text-muted); font-size: 0.9rem;">السعر المحسوب تلقائياً للقطعة الواحدة:</span>
+                        <strong id="preview-piece-price" style="color: var(--warning-color); font-size: 1.2rem; margin-right: 5px;">0.00 ج.م</strong>
+                    </div>
+                </div>
+
                 <button type="submit" class="btn btn-primary">حفظ المنتج بداخل قاعدة البيانات</button>
             </form>
         </div>
 
-        <!-- الزر 2: صفحة عرض المخزن -->
+        <!-- 2. صفحة عرض المخزن -->
         <div id="inventory-page" class="page-view">
             <div class="page-header">
-                <h2>جدول سلع المخزن</h2>
+                <h2>جدول سلع المخزن بالأسعار والقطع</h2>
             </div>
             <div class="table-responsive">
                 <table>
@@ -566,58 +449,68 @@
                             <th>#</th>
                             <th>اسم المنتج</th>
                             <th>التصنيف</th>
-                            <th>السعر / الوحدة</th>
-                            <th>الكمية بالمخزن</th>
-                            <th>سعر الكمية الكلية</th>
+                            <th>سعر العبوة</th>
+                            <th>سعر القطعة (تلقائي)</th>
+                            <th>الكمية المتاحة</th>
+                            <th>القيمة الإجمالية</th>
                             <th>الإجراءات</th>
                         </tr>
                     </thead>
-                    <tbody id="inventory-tbody">
-                        <!-- يتم تحميل بيانات المنتجات هنا عبر JS -->
-                    </tbody>
+                    <tbody id="inventory-tbody"></tbody>
                 </table>
             </div>
         </div>
 
-        <!-- الزر 3: صفحة الجرد النصف يدوي والحاسبة -->
+        <!-- 3. صفحة الجرد والحاسبة المزدوجة -->
         <div id="stocktaking-page" class="page-view">
             <div class="page-header">
-                <h2>شاشة الجرد النصف يدوي والحاسبة</h2>
+                <h2>شاشة الجرد النصف يدوي والحاسبة المزدوجة</h2>
             </div>
             
             <div style="position: relative; max-width: 500px; margin-bottom: 1.5rem;">
                 <label style="font-weight: bold; display: block; margin-bottom: 0.5rem; color: var(--text-muted);">ابحث عن السلعة للجرد:</label>
-                <input type="text" id="st-search" placeholder="اكتب اسم السلعة للبحث السريع..." style="width: 100%; padding: 0.85rem; border-radius: 10px; border: 1px solid var(--border-color); background: #0f172a; color: white;">
+                <input type="text" id="st-search" placeholder="اكتب اسم السلعة للبحث..." style="width: 100%; padding: 0.85rem; border-radius: 10px; border: 1px solid var(--border-color); background: #0f172a; color: white;">
                 <div id="st-results" class="search-results" style="display: none;"></div>
             </div>
 
             <div id="calc-details" class="calc-card" style="display: none;">
-                <h3 style="color: var(--primary-color); margin-bottom: 1rem;">تفاصيل السلعة المحددة:</h3>
-                <p><strong>اسم السلعة:</strong> <span id="st-selected-name" style="color: var(--primary-color);">-</span></p>
-                <p><strong>التصنيف:</strong> <span id="st-selected-cat">-</span></p>
-                <p><strong>سعر الوحدة:</strong> <span id="st-selected-price">-</span></p>
+                <h3 style="color: var(--primary-color); margin-bottom: 1rem;">تفاصيل الجرد للسلعة المحددة:</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-bottom: 1rem;">
+                    <p><strong>اسم السلعة:</strong> <span id="st-selected-name" style="color: var(--primary-color);">-</span></p>
+                    <p><strong>نوع العبوة:</strong> <span id="st-selected-unit" style="color: var(--accent-color);">-</span></p>
+                    <p><strong>سعر العبوة:</strong> <span id="st-selected-pack-price" style="color: var(--primary-color);">-</span></p>
+                    <p><strong>سعر القطعة المحسوب:</strong> <span id="st-selected-piece-price" style="color: var(--warning-color);">-</span></p>
+                </div>
                 
                 <hr style="margin: 1.2rem 0; border: none; border-top: 1px solid var(--border-color);">
 
-                <div class="form-group" style="max-width: 300px;">
-                    <label id="st-qty-label">أدخل الكمية التي تم جردها الآن:</label>
-                    <input type="number" id="st-qty" placeholder="أدخل الكمية..." min="0" value="1">
+                <h4 style="margin-bottom: 1rem; color: var(--text-color);">أدخل الكميات التي وجدتها أثناء الجرد:</h4>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label id="st-pack-label">عدد العبوات الكاملة:</label>
+                        <input type="number" id="st-pack-qty" placeholder="0" min="0" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label>عدد القطع الفرعية الزائدة:</label>
+                        <input type="number" id="st-piece-qty" placeholder="0" min="0" value="0">
+                    </div>
                 </div>
 
                 <div style="margin-top: 1.5rem; background: var(--card-bg); padding: 1.2rem; border-radius: 10px; border-right: 5px solid var(--primary-color);">
-                    <h4 style="color: var(--text-muted); font-size: 0.9rem;">إجمالي قيمة هذه السلعة للكمية المحددة:</h4>
+                    <h4 style="color: var(--text-muted); font-size: 0.9rem;">إجمالي قيمة الكمية المتبقية للجرد:</h4>
                     <div id="st-total-price" style="font-size: 2rem; font-weight: bold; color: var(--primary-color); margin-top: 5px;">0.00 ج.م</div>
+                    <small id="st-breakdown" style="color: var(--text-muted); display: block; margin-top: 5px;"></small>
                 </div>
             </div>
         </div>
 
     </div>
 
-    <!-- ✏️ النافذة المنبثقة لتعديل المنتج (Edit Modal) -->
+    <!-- نافذة تعديل المنتج -->
     <div id="edit-modal" class="modal-overlay">
         <div class="modal-card">
             <div class="modal-header">
-                <h3>✏️ تعديل بيانات المنتج</h3>
+                <h3 style="color: var(--warning-color);">✏️ تعديل بيانات المنتج</h3>
                 <button class="close-btn" onclick="closeEditModal()">&times;</button>
             </div>
             <form id="edit-product-form">
@@ -632,21 +525,33 @@
                         <input type="text" id="edit-p-category" required>
                     </div>
                     <div class="form-group">
-                        <label>السعر (ج.م)</label>
+                        <label>سعر العبوة الكلي (ج.م)</label>
                         <input type="number" step="0.01" id="edit-p-price" required>
                     </div>
                     <div class="form-group">
-                        <label>نوع الوحدة</label>
+                        <label>الوحدة (مثل: كرتونة 24 ق)</label>
                         <div class="unit-input-wrapper">
                             <input type="text" id="edit-p-unit" list="units-list" required>
-                            <button type="button" class="btn-add-unit" onclick="promptAddNewUnit('edit-p-unit')">+ وحدة جديدة</button>
+                            <button type="button" class="btn-add-unit" onclick="promptAddNewUnit('edit-p-unit')">+ وحدة</button>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label>الكمية بالمخزن</label>
+                        <label>الكمية بالمخزن (بالعبوات)</label>
                         <input type="number" id="edit-p-qty" min="0" required>
                     </div>
                 </div>
+
+                <div class="calculated-box" id="edit-calc-preview">
+                    <div>
+                        <span style="color: var(--text-muted); font-size: 0.85rem;">عدد القطع للعبوة:</span>
+                        <strong id="edit-preview-count" style="color: var(--accent-color);">1</strong>
+                    </div>
+                    <div>
+                        <span style="color: var(--text-muted); font-size: 0.85rem;">سعر القطعة الفردية:</span>
+                        <strong id="edit-preview-piece-price" style="color: var(--warning-color); font-size: 1.1rem;">0.00 ج.م</strong>
+                    </div>
+                </div>
+
                 <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 1rem;">
                     <button type="button" class="btn btn-danger" onclick="closeEditModal()">إلغاء</button>
                     <button type="submit" class="btn btn-primary" style="background: var(--warning-color); color: #0f172a;">حفظ التعديلات</button>
@@ -655,21 +560,21 @@
         </div>
     </div>
 
-    <!-- ⚡ أكواد البرمجة وقاعدة البيانات (IndexedDB) مدمجة بالكامل -->
+    <!-- برمجة IndexedDB وذكاء استخراج الأرقام من النصوص -->
     <script>
         const DB_NAME = 'SupermarketDB';
         const DB_VERSION = 1;
         let db = null;
         let selectedProductForStock = null;
 
-        // إدارة قائمة الوحدات الدائمة في localStorage
-        const DEFAULT_UNITS = ['قطعة', 'علبة', 'كرتونة', 'باكتة', 'كيلو', 'لتر', 'جرام', 'كيس', 'طرد', 'زجاجة', 'كانز'];
+        const DEFAULT_UNITS = [
+            'كرتونة 24 ق', 'كرتونة 12 ق', 'باكتة 12 ق', 'باكتة 6 ق', 
+            'طرد 20 قطعة', 'علبة 10 قطع', 'قطعة فردية', 'كيلو'
+        ];
 
         function getStoredUnits() {
             const stored = localStorage.getItem('supermarket_units');
-            if (stored) {
-                return JSON.parse(stored);
-            }
+            if (stored) return JSON.parse(stored);
             localStorage.setItem('supermarket_units', JSON.stringify(DEFAULT_UNITS));
             return DEFAULT_UNITS;
         }
@@ -698,99 +603,134 @@
         }
 
         function promptAddNewUnit(targetInputId) {
-            const newUnit = prompt('أدخل اسم الوحدة الجديدة (مثال: طرد، شريط، لفة، باكتة):');
+            const newUnit = prompt('أدخل اسم الوحدة مع عدد القطع (مثال: كرتونة 36 ق، باكتة 8 قطعة):');
             if (newUnit && newUnit.trim()) {
                 saveUnitIfNew(newUnit.trim());
                 if (targetInputId && document.getElementById(targetInputId)) {
                     document.getElementById(targetInputId).value = newUnit.trim();
+                    triggerUnitCalculation(targetInputId);
                 }
             }
         }
 
-        // تهيئة قاعدة البيانات أوفلاين
+        // 🧠 الدالة الذكية لاستخراج عدد القطع من نص الوحدة تلقائياً
+        function extractPieceCountFromUnit(unitText) {
+            if (!unitText) return 1;
+            // البحث عن أي رقم داخل النص (مثلاً 24 من "كرتونة 24 ق")
+            const match = unitText.match(/\d+/);
+            if (match) {
+                const count = parseInt(match[0], 10);
+                return count > 0 ? count : 1;
+            }
+            return 1; // الافتراضي 1 إذا كانت قطعة مفردة
+        }
+
+        // حساب سعر القطعة فوري أثناء الكتابة
+        function setupLivePriceCalculators() {
+            const pPrice = document.getElementById('p-price');
+            const pUnit = document.getElementById('p-unit');
+
+            const updateAddPreview = () => {
+                const price = parseFloat(pPrice.value) || 0;
+                const unitStr = pUnit.value.trim();
+                const count = extractPieceCountFromUnit(unitStr);
+                
+                if (price > 0 && unitStr !== '') {
+                    const piecePrice = price / count;
+                    document.getElementById('preview-count').textContent = count;
+                    document.getElementById('preview-piece-price').textContent = piecePrice.toFixed(2) + ' ج.م';
+                    document.getElementById('calc-preview').style.display = 'flex';
+                } else {
+                    document.getElementById('calc-preview').style.display = 'none';
+                }
+            };
+
+            pPrice.addEventListener('input', updateAddPreview);
+            pUnit.addEventListener('input', updateAddPreview);
+
+            // للتعديل
+            const editPrice = document.getElementById('edit-p-price');
+            const editUnit = document.getElementById('edit-p-unit');
+
+            const updateEditPreview = () => {
+                const price = parseFloat(editPrice.value) || 0;
+                const unitStr = editUnit.value.trim();
+                const count = extractPieceCountFromUnit(unitStr);
+                const piecePrice = price / count;
+                document.getElementById('edit-preview-count').textContent = count;
+                document.getElementById('edit-preview-piece-price').textContent = piecePrice.toFixed(2) + ' ج.م';
+            };
+
+            editPrice.addEventListener('input', updateEditPreview);
+            editUnit.addEventListener('input', updateEditPreview);
+        }
+
+        function triggerUnitCalculation(inputId) {
+            const event = new Event('input', { bubbles: true });
+            document.getElementById(inputId).dispatchEvent(event);
+        }
+
+        // تهيئة قاعدة البيانات المحلية
         function initDB() {
             return new Promise((resolve, reject) => {
                 const request = indexedDB.open(DB_NAME, DB_VERSION);
-
                 request.onupgradeneeded = (e) => {
                     const database = e.target.result;
                     if (!database.objectStoreNames.contains('products')) {
                         const store = database.createObjectStore('products', { keyPath: 'id', autoIncrement: true });
                         store.createIndex('name', 'name', { unique: false });
-                        store.createIndex('category', 'category', { unique: false });
                     }
                 };
-
-                request.onsuccess = (e) => {
-                    db = e.target.result;
-                    resolve(db);
-                };
-
-                request.onerror = (e) => reject('خطأ في قاعدة البيانات المحلية: ' + e.target.error);
+                request.onsuccess = (e) => { db = e.target.result; resolve(db); };
+                request.onerror = (e) => reject(e.target.error);
             });
         }
 
         function addProductToDB(product) {
-            return new Promise((resolve, reject) => {
+            return new Promise((resolve) => {
                 const tx = db.transaction('products', 'readwrite');
-                const store = tx.objectStore('products');
-                const req = store.add(product);
-                req.onsuccess = () => resolve(req.result);
-                req.onerror = () => reject(req.error);
+                tx.objectStore('products').add(product).onsuccess = () => resolve(true);
             });
         }
 
         function getAllProductsFromDB() {
-            return new Promise((resolve, reject) => {
+            return new Promise((resolve) => {
                 const tx = db.transaction('products', 'readonly');
-                const store = tx.objectStore('products');
-                const req = store.getAll();
-                req.onsuccess = () => resolve(req.result);
-                req.onerror = () => reject(req.error);
+                tx.objectStore('products').getAll().onsuccess = (e) => resolve(e.target.result);
             });
         }
 
         function getProductFromDB(id) {
-            return new Promise((resolve, reject) => {
+            return new Promise((resolve) => {
                 const tx = db.transaction('products', 'readonly');
-                const store = tx.objectStore('products');
-                const req = store.get(id);
-                req.onsuccess = () => resolve(req.result);
-                req.onerror = () => reject(req.error);
+                tx.objectStore('products').get(id).onsuccess = (e) => resolve(e.target.result);
             });
         }
 
         function updateProductInDB(product) {
-            return new Promise((resolve, reject) => {
+            return new Promise((resolve) => {
                 const tx = db.transaction('products', 'readwrite');
-                const store = tx.objectStore('products');
-                const req = store.put(product);
-                req.onsuccess = () => resolve(true);
-                req.onerror = () => reject(req.error);
+                tx.objectStore('products').put(product).onsuccess = () => resolve(true);
             });
         }
 
         function deleteProductFromDB(id) {
-            return new Promise((resolve, reject) => {
+            return new Promise((resolve) => {
                 const tx = db.transaction('products', 'readwrite');
-                const store = tx.objectStore('products');
-                const req = store.delete(id);
-                req.onsuccess = () => resolve(true);
-                req.onerror = () => reject(req.error);
+                tx.objectStore('products').delete(id).onsuccess = () => resolve(true);
             });
         }
 
-        // تشغيل النظام عند تحميل الصفحة
         document.addEventListener('DOMContentLoaded', async () => {
             renderUnitsDatalist();
             await initDB();
             setupNavigation();
             setupFormHandlers();
+            setupLivePriceCalculators();
             setupStocktakingSearch();
             updateDashboardStats();
         });
 
-        // إدارة التنقل بين الصفحات والأزرار
         function setupNavigation() {
             const navCards = document.querySelectorAll('.nav-card');
             const pageViews = document.querySelectorAll('.page-view');
@@ -798,41 +738,32 @@
             navCards.forEach(card => {
                 card.addEventListener('click', () => {
                     const targetPage = card.getAttribute('data-page');
-
                     navCards.forEach(c => c.classList.remove('active-tab'));
                     card.classList.add('active-tab');
 
                     pageViews.forEach(page => {
                         page.classList.remove('active');
-                        if (page.id === targetPage) {
-                            page.classList.add('active');
-                        }
+                        if (page.id === targetPage) page.classList.add('active');
                     });
 
-                    if (targetPage === 'inventory-page') {
-                        renderInventoryTable();
-                    } else if (targetPage === 'stocktaking-page') {
-                        resetStocktakingForm();
-                    }
+                    if (targetPage === 'inventory-page') renderInventoryTable();
+                    else if (targetPage === 'stocktaking-page') resetStocktakingForm();
                 });
             });
         }
 
-        // تحديث إحصائيات الداشبورد
         async function updateDashboardStats() {
             const products = await getAllProductsFromDB();
             document.getElementById('stat-total-products').textContent = products.length;
             const categories = new Set(products.map(p => p.category ? p.category.trim() : ''));
             document.getElementById('stat-total-categories').textContent = categories.size;
             
-            // حساب القيمة الكلية للمخزون (السعر × الكمية)
             const totalValue = products.reduce((sum, p) => sum + (parseFloat(p.price || 0) * parseFloat(p.qty || 0)), 0);
             document.getElementById('stat-total-value').textContent = totalValue.toFixed(2) + ' ج.م';
         }
 
-        // التعامل مع حفظ وتعديل المنتجات
         function setupFormHandlers() {
-            // إضافة منتج جديد
+            // حفظ المنتج
             document.getElementById('product-form').addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const name = document.getElementById('p-name').value.trim();
@@ -841,17 +772,21 @@
                 const unit = document.getElementById('p-unit').value.trim();
                 const qty = parseFloat(document.getElementById('p-qty').value) || 0;
 
+                const piecesPerPack = extractPieceCountFromUnit(unit);
+                const piecePrice = price / piecesPerPack;
+
                 saveUnitIfNew(unit);
 
-                const product = { name, category, price, unit, qty };
+                const product = { name, category, price, unit, piecesPerPack, piecePrice, qty };
                 await addProductToDB(product);
 
-                alert('✅ تم حفظ المنتج بنجاح في قاعدة البيانات!');
+                alert('✅ تم حفظ المنتج بنجاح مع حساب سعر القطعة تلقائياً!');
                 document.getElementById('product-form').reset();
+                document.getElementById('calc-preview').style.display = 'none';
                 updateDashboardStats();
             });
 
-            // تعديل منتج قائم (تم إصلاح الربط والمعالجة)
+            // تعديل المنتج
             document.getElementById('edit-product-form').addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const id = parseInt(document.getElementById('edit-p-id').value);
@@ -861,57 +796,57 @@
                 const unit = document.getElementById('edit-p-unit').value.trim();
                 const qty = parseFloat(document.getElementById('edit-p-qty').value) || 0;
 
+                const piecesPerPack = extractPieceCountFromUnit(unit);
+                const piecePrice = price / piecesPerPack;
+
                 saveUnitIfNew(unit);
 
-                const updatedProduct = { id, name, category, price, unit, qty };
+                const updatedProduct = { id, name, category, price, unit, piecesPerPack, piecePrice, qty };
                 await updateProductInDB(updatedProduct);
 
-                alert('✅ تم تحديث بيانات المنتج بنجاح!');
+                alert('✅ تم تحديث التعديلات وحساب السعر الجديد للقطعة!');
                 closeEditModal();
                 renderInventoryTable();
                 updateDashboardStats();
             });
         }
 
-        // عرض جدول المخزون
         async function renderInventoryTable() {
             const tbody = document.getElementById('inventory-tbody');
-            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">جاري تحميل البيانات...</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;">جاري التحميل...</td></tr>';
 
             const products = await getAllProductsFromDB();
             if (products.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color: var(--text-muted);">لا توجد منتجات مسجلة حتى الآن في المخزن.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; color: var(--text-muted);">لا توجد منتجات بالمخزن.</td></tr>';
                 return;
             }
 
             tbody.innerHTML = '';
             products.forEach((p, index) => {
                 const tr = document.createElement('tr');
-                
-                const unitPrice = parseFloat(p.price || 0);
+                const packPrice = parseFloat(p.price || 0);
+                const piecesCount = p.piecesPerPack || extractPieceCountFromUnit(p.unit);
+                const piecePrice = p.piecePrice || (packPrice / piecesCount);
                 const qty = parseFloat(p.qty || 0);
-                const totalPrice = unitPrice * qty;
-                const unitName = p.unit || p.mainUnit || 'وحدة';
+                const totalPrice = packPrice * qty;
 
                 tr.innerHTML = `
                     <td>${index + 1}</td>
                     <td><strong>${escapeHtml(p.name)}</strong></td>
                     <td><span style="color: var(--text-muted);">${escapeHtml(p.category)}</span></td>
-                    <td><span class="price-badge price-unit">${unitPrice.toFixed(2)} ج.م / ${escapeHtml(unitName)}</span></td>
-                    <td><strong>${qty} ${escapeHtml(unitName)}</strong></td>
-                    <td><span class="price-badge price-total">${totalPrice.toFixed(2)} ج.م</span></td>
+                    <td><span class="price-badge price-unit">${packPrice.toFixed(2)} ج.م / ${escapeHtml(p.unit)}</span></td>
+                    <td><span class="price-badge price-piece">${piecePrice.toFixed(2)} ج.م / قطعة</span></td>
+                    <td><strong>${qty} عبوة</strong></td>
+                    <td><strong style="color: var(--primary-color);">${totalPrice.toFixed(2)} ج.م</strong></td>
                     <td>
-                        <div class="actions-cell">
-                            <button class="btn-edit" onclick="openEditModal(${p.id})">✏️ تعديل</button>
-                            <button class="btn-danger" onclick="deleteProduct(${p.id})">🗑️ حذف</button>
-                        </div>
+                        <button class="btn-edit" onclick="openEditModal(${p.id})">✏️ تعديل</button>
+                        <button class="btn-danger" onclick="deleteProduct(${p.id})">🗑️ حذف</button>
                     </td>
                 `;
                 tbody.appendChild(tr);
             });
         }
 
-        // فتح النافذة المنبثقة للتعديل
         async function openEditModal(id) {
             const p = await getProductFromDB(id);
             if (!p) return;
@@ -920,9 +855,10 @@
             document.getElementById('edit-p-name').value = p.name;
             document.getElementById('edit-p-category').value = p.category;
             document.getElementById('edit-p-price').value = p.price;
-            document.getElementById('edit-p-unit').value = p.unit || p.mainUnit || '';
+            document.getElementById('edit-p-unit').value = p.unit || '';
             document.getElementById('edit-p-qty').value = p.qty;
 
+            triggerUnitCalculation('edit-p-unit');
             document.getElementById('edit-modal').classList.add('active');
         }
 
@@ -930,27 +866,24 @@
             document.getElementById('edit-modal').classList.remove('active');
         }
 
-        // حذف منتج
         async function deleteProduct(id) {
-            if (confirm('هل أنت تأكد من رغبتك في حذف هذا المنتج نهائياً من المخزن؟')) {
+            if (confirm('هل أنت تأكد من الحذف النهائي؟')) {
                 await deleteProductFromDB(id);
                 renderInventoryTable();
                 updateDashboardStats();
             }
         }
 
-        // وظائف الجرد والبحث الحركي
+        // 🧮 الجرد والحاسبة المزدوجة (باكتة + قطعة)
         function setupStocktakingSearch() {
             const searchInput = document.getElementById('st-search');
             const resultsDiv = document.getElementById('st-results');
-            const qtyInput = document.getElementById('st-qty');
+            const packQtyInput = document.getElementById('st-pack-qty');
+            const pieceQtyInput = document.getElementById('st-piece-qty');
 
             searchInput.addEventListener('input', async () => {
                 const query = searchInput.value.trim().toLowerCase();
-                if (!query) {
-                    resultsDiv.style.display = 'none';
-                    return;
-                }
+                if (!query) { resultsDiv.style.display = 'none'; return; }
 
                 const products = await getAllProductsFromDB();
                 const filtered = products.filter(p => p.name.toLowerCase().includes(query) || (p.category && p.category.toLowerCase().includes(query)));
@@ -962,8 +895,7 @@
                     filtered.forEach(p => {
                         const div = document.createElement('div');
                         div.className = 'search-item';
-                        const uName = p.unit || p.mainUnit || 'وحدة';
-                        div.innerHTML = `<strong>${escapeHtml(p.name)}</strong> - <small>${escapeHtml(p.category)}</small> (${p.price} ج.م / ${escapeHtml(uName)})`;
+                        div.innerHTML = `<strong>${escapeHtml(p.name)}</strong> (${p.price} ج.م / ${escapeHtml(p.unit)})`;
                         div.onclick = () => selectProductForStocktaking(p);
                         resultsDiv.appendChild(div);
                     });
@@ -971,7 +903,8 @@
                 resultsDiv.style.display = 'block';
             });
 
-            qtyInput.addEventListener('input', calculateStockTotal);
+            packQtyInput.addEventListener('input', calculateDualStockTotal);
+            pieceQtyInput.addEventListener('input', calculateDualStockTotal);
         }
 
         function selectProductForStocktaking(product) {
@@ -979,24 +912,39 @@
             document.getElementById('st-search').value = product.name;
             document.getElementById('st-results').style.display = 'none';
 
-            const uName = product.unit || product.mainUnit || 'وحدة';
+            const piecesCount = product.piecesPerPack || extractPieceCountFromUnit(product.unit);
+            const piecePrice = product.piecePrice || (product.price / piecesCount);
 
             document.getElementById('st-selected-name').textContent = product.name;
-            document.getElementById('st-selected-cat').textContent = product.category;
-            document.getElementById('st-selected-price').textContent = `${parseFloat(product.price).toFixed(2)} ج.م لكل (${uName})`;
+            document.getElementById('st-selected-unit').textContent = product.unit;
+            document.getElementById('st-selected-pack-price').textContent = `${parseFloat(product.price).toFixed(2)} ج.م`;
+            document.getElementById('st-selected-piece-price').textContent = `${piecePrice.toFixed(2)} ج.م`;
             
-            document.getElementById('st-qty-label').textContent = `أدخل عدد (${uName}) التي تم جردها:`;
+            document.getElementById('st-pack-label').textContent = `عدد العبوات الكاملة (${product.unit}):`;
 
             document.getElementById('calc-details').style.display = 'block';
-            document.getElementById('st-qty').value = product.qty || 1;
-            calculateStockTotal();
+            document.getElementById('st-pack-qty').value = product.qty || 0;
+            document.getElementById('st-piece-qty').value = 0;
+
+            calculateDualStockTotal();
         }
 
-        function calculateStockTotal() {
+        function calculateDualStockTotal() {
             if (!selectedProductForStock) return;
-            const qty = parseFloat(document.getElementById('st-qty').value) || 0;
-            const total = qty * parseFloat(selectedProductForStock.price || 0);
-            document.getElementById('st-total-price').textContent = total.toFixed(2) + ' ج.م';
+
+            const packPrice = parseFloat(selectedProductForStock.price || 0);
+            const piecesCount = selectedProductForStock.piecesPerPack || extractPieceCountFromUnit(selectedProductForStock.unit);
+            const piecePrice = selectedProductForStock.piecePrice || (packPrice / piecesCount);
+
+            const packs = parseFloat(document.getElementById('st-pack-qty').value) || 0;
+            const pieces = parseFloat(document.getElementById('st-piece-qty').value) || 0;
+
+            const totalPackValue = packs * packPrice;
+            const totalPieceValue = pieces * piecePrice;
+            const grandTotal = totalPackValue + totalPieceValue;
+
+            document.getElementById('st-total-price').textContent = grandTotal.toFixed(2) + ' ج.م';
+            document.getElementById('st-breakdown').textContent = `تفاصيل الحساب: (${packs} عبوة × ${packPrice} ج.م) + (${pieces} قطعة × ${piecePrice.toFixed(2)} ج.م)`;
         }
 
         function resetStocktakingForm() {
@@ -1006,7 +954,6 @@
             document.getElementById('calc-details').style.display = 'none';
         }
 
-        // أداة مساعدة لحماية المدخلات النصية
         function escapeHtml(str) {
             return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
         }
