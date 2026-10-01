@@ -178,17 +178,33 @@
             color: var(--text-muted);
         }
 
-        .form-group input, .form-group select {
+        /* 🎨 منع تغير لون الخانات للون الأبيض أثناء الكتابة أو الإكمال التلقائي */
+        .form-group input, .form-group select, #st-search {
             padding: 0.8rem 1rem;
-            background: #0f172a;
+            background-color: #0f172a !important;
             border: 1px solid var(--border-color);
             border-radius: 10px;
             outline: none;
             font-size: 0.95rem;
-            color: var(--text-color);
+            color: var(--text-color) !important;
+            transition: border-color 0.2s;
         }
 
-        .form-group input:focus { border-color: var(--primary-color); }
+        .form-group input:focus, .form-group select:focus, #st-search:focus { 
+            border-color: var(--primary-color) !important; 
+            background-color: #0f172a !important;
+            color: var(--text-color) !important;
+        }
+
+        /* حل مشكلة تغير اللون التلقائي للمتصفح (Autofill Fix) */
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover, 
+        input:-webkit-autofill:focus,
+        input:-webkit-autofill:active {
+            -webkit-box-shadow: 0 0 0 30px #0f172a inset !important;
+            -webkit-text-fill-color: var(--text-color) !important;
+            transition: background-color 5000s ease-in-out 0s;
+        }
 
         .unit-input-wrapper { display: flex; gap: 8px; }
         .unit-input-wrapper input { flex: 1; }
@@ -334,7 +350,7 @@
 
     <nav class="navbar">
         <div class="logo">
-            🛒 <span> السوبر ماركت </span>
+            🛒 <span>سوبر ماركت </span>
         </div>
         <div class="offline-badge">● أوفلاين (شغال بدون إنترنت)</div>
     </nav>
@@ -408,7 +424,6 @@
                         <label>سعر العبوة الكلي (ج.م)</label>
                         <input type="number" step="0.01" id="p-price" placeholder="مثال: 240 (سعر الكرتونة)" required>
                     </div>
-                    
                     <div class="form-group">
                         <label>الوحدة (مع تحديد عدد القطع)</label>
                         <div class="unit-input-wrapper">
@@ -462,7 +477,7 @@
             </div>
         </div>
 
-        <!-- 3. صفحة الجرد والحاسبة المزدوجة -->
+        <!-- 3. صفحة الجرد والحاسبة المزدوجة وقائمة الجرد -->
         <div id="stocktaking-page" class="page-view">
             <div class="page-header">
                 <h2>شاشة الجرد النصف يدوي والحاسبة المزدوجة</h2>
@@ -470,7 +485,7 @@
             
             <div style="position: relative; max-width: 500px; margin-bottom: 1.5rem;">
                 <label style="font-weight: bold; display: block; margin-bottom: 0.5rem; color: var(--text-muted);">ابحث عن السلعة للجرد:</label>
-                <input type="text" id="st-search" placeholder="اكتب اسم السلعة للبحث..." style="width: 100%; padding: 0.85rem; border-radius: 10px; border: 1px solid var(--border-color); background: #0f172a; color: white;">
+                <input type="text" id="st-search" placeholder="اكتب اسم السلعة للبحث..." style="width: 100%;">
                 <div id="st-results" class="search-results" style="display: none;"></div>
             </div>
 
@@ -489,25 +504,68 @@
                 <div class="form-grid">
                     <div class="form-group">
                         <label id="st-pack-label">عدد العبوات الكاملة:</label>
-                        <input type="number" id="st-pack-qty" placeholder="0" min="0" value="0">
+                        <input type="number" id="st-pack-qty" placeholder="0" min="0">
                     </div>
                     <div class="form-group">
                         <label>عدد القطع الفرعية الزائدة:</label>
-                        <input type="number" id="st-piece-qty" placeholder="0" min="0" value="0">
+                        <input type="number" id="st-piece-qty" placeholder="0" min="0">
                     </div>
                 </div>
 
-                <div style="margin-top: 1.5rem; background: var(--card-bg); padding: 1.2rem; border-radius: 10px; border-right: 5px solid var(--primary-color);">
-                    <h4 style="color: var(--text-muted); font-size: 0.9rem;">إجمالي قيمة الكمية المتبقية للجرد:</h4>
-                    <div id="st-total-price" style="font-size: 2rem; font-weight: bold; color: var(--primary-color); margin-top: 5px;">0.00 ج.م</div>
-                    <small id="st-breakdown" style="color: var(--text-muted); display: block; margin-top: 5px;"></small>
+                <div style="margin-top: 1.5rem; background: var(--card-bg); padding: 1.2rem; border-radius: 10px; border-right: 5px solid var(--primary-color); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                    <div>
+                        <h4 style="color: var(--text-muted); font-size: 0.9rem;">إجمالي قيمة السلعة المحددة للجرد:</h4>
+                        <div id="st-total-price" style="font-size: 2rem; font-weight: bold; color: var(--primary-color); margin-top: 5px;">0.00 ج.م</div>
+                        <small id="st-breakdown" style="color: var(--text-muted); display: block; margin-top: 5px;"></small>
+                    </div>
+                    <!-- زر الجرد واضافة المنتج للقائمة -->
+                    <button type="button" class="btn btn-primary" onclick="addCurrentProductToStockList()" style="font-size: 1.1rem; padding: 0.9rem 2rem;">
+                        📋 جرد
+                    </button>
                 </div>
             </div>
+
+            <!-- قائمة الجرد الكلية مع أزرار التعديل والحذف -->
+            <div style="margin-top: 2.5rem; border-top: 2px dashed var(--border-color); padding-top: 1.5rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h3 style="color: var(--warning-color); display: flex; align-items: center; gap: 8px;">
+                        📝 كشف المنتجات التي تم جردها
+                    </h3>
+                    <button type="button" class="btn-danger" onclick="clearStockList()" style="padding: 0.5rem 1rem;">مسح الكشف بالكامل</button>
+                </div>
+
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>اسم السلعة</th>
+                                <th>إجمالي عدد القطع</th>
+                                <th>سعر القطعة</th>
+                                <th>إجمالي السعر</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="stock-list-tbody">
+                            <tr>
+                                <td colspan="6" style="text-align: center; color: var(--text-muted);">لم يتم إضافة أي منتجات لكشف الجرد بعد.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- إجمالي قيمة الجرد الكلية تحت القائمة -->
+                <div style="margin-top: 1.5rem; background: #1e293b; padding: 1.5rem; border-radius: 12px; border: 2px solid var(--primary-color); text-align: center;">
+                    <h3 style="color: var(--text-muted); font-size: 1.1rem; margin-bottom: 5px;">إجمالي قيمة الجرد الكلية (لجميع السلع بالكشف)</h3>
+                    <div id="stock-grand-total" style="font-size: 2.5rem; font-weight: bold; color: var(--primary-color);">0.00 ج.م</div>
+                </div>
+            </div>
+
         </div>
 
     </div>
 
-    <!-- نافذة تعديل المنتج -->
+    <!-- نافذة تعديل المنتج بالمخزن -->
     <div id="edit-modal" class="modal-overlay">
         <div class="modal-card">
             <div class="modal-header">
@@ -561,12 +619,15 @@
         </div>
     </div>
 
-    <!-- برمجة IndexedDB وذكاء استخراج الأرقام من النصوص -->
+    <!-- البرمجة السليمة وشاملة خاصية تعديل سطر الجرد -->
     <script>
         const DB_NAME = 'SupermarketDB';
         const DB_VERSION = 1;
         let db = null;
         let selectedProductForStock = null;
+        
+        // مصفوفة حفظ قائمة الجرد مؤقتاً
+        let stockSessionList = [];
 
         const DEFAULT_UNITS = [
             'كرتونة 24 ق', 'كرتونة 12 ق', 'باكتة 12 ق', 'باكتة 6 ق', 
@@ -614,19 +675,18 @@
             }
         }
 
-        // 🧠 الدالة الذكية لاستخراج عدد القطع من نص الوحدة تلقائياً
+        // استخراج عدد القطع تلقائياً من اسم الوحدة
         function extractPieceCountFromUnit(unitText) {
             if (!unitText) return 1;
-            // البحث عن أي رقم داخل النص (مثلاً 24 من "كرتونة 24 ق")
             const match = unitText.match(/\d+/);
             if (match) {
                 const count = parseInt(match[0], 10);
                 return count > 0 ? count : 1;
             }
-            return 1; // الافتراضي 1 إذا كانت قطعة مفردة
+            return 1;
         }
 
-        // حساب سعر القطعة فوري أثناء الكتابة
+        // حساب سعر القطعة أثناء الكتابة
         function setupLivePriceCalculators() {
             const pPrice = document.getElementById('p-price');
             const pUnit = document.getElementById('p-unit');
@@ -649,7 +709,6 @@
             pPrice.addEventListener('input', updateAddPreview);
             pUnit.addEventListener('input', updateAddPreview);
 
-            // للتعديل
             const editPrice = document.getElementById('edit-p-price');
             const editUnit = document.getElementById('edit-p-unit');
 
@@ -671,7 +730,7 @@
             document.getElementById(inputId).dispatchEvent(event);
         }
 
-        // تهيئة قاعدة البيانات المحلية
+        // IndexedDB
         function initDB() {
             return new Promise((resolve, reject) => {
                 const request = indexedDB.open(DB_NAME, DB_VERSION);
@@ -730,6 +789,7 @@
             setupLivePriceCalculators();
             setupStocktakingSearch();
             updateDashboardStats();
+            renderStockListTable();
         });
 
         function setupNavigation() {
@@ -764,7 +824,6 @@
         }
 
         function setupFormHandlers() {
-            // حفظ المنتج
             document.getElementById('product-form').addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const name = document.getElementById('p-name').value.trim();
@@ -787,7 +846,6 @@
                 updateDashboardStats();
             });
 
-            // تعديل المنتج
             document.getElementById('edit-product-form').addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const id = parseInt(document.getElementById('edit-p-id').value);
@@ -875,7 +933,7 @@
             }
         }
 
-        // 🧮 الجرد والحاسبة المزدوجة (باكتة + قطعة)
+        // الجرد والحاسبة المزدوجة
         function setupStocktakingSearch() {
             const searchInput = document.getElementById('st-search');
             const resultsDiv = document.getElementById('st-results');
@@ -908,7 +966,7 @@
             pieceQtyInput.addEventListener('input', calculateDualStockTotal);
         }
 
-        function selectProductForStocktaking(product) {
+        function selectProductForStocktaking(product, initialPacks = '', initialPieces = '') {
             selectedProductForStock = product;
             document.getElementById('st-search').value = product.name;
             document.getElementById('st-results').style.display = 'none';
@@ -924,14 +982,16 @@
             document.getElementById('st-pack-label').textContent = `عدد العبوات الكاملة (${product.unit}):`;
 
             document.getElementById('calc-details').style.display = 'block';
-            document.getElementById('st-pack-qty').value = product.qty || 0;
-            document.getElementById('st-piece-qty').value = 0;
+
+            // ملء الخانات إما فارغة أو بالقيم السابقة عند التعديل
+            document.getElementById('st-pack-qty').value = initialPacks;
+            document.getElementById('st-piece-qty').value = initialPieces;
 
             calculateDualStockTotal();
         }
 
         function calculateDualStockTotal() {
-            if (!selectedProductForStock) return;
+            if (!selectedProductForStock) return { grandTotal: 0, totalPieces: 0, piecePrice: 0, packs: 0, pieces: 0 };
 
             const packPrice = parseFloat(selectedProductForStock.price || 0);
             const piecesCount = selectedProductForStock.piecesPerPack || extractPieceCountFromUnit(selectedProductForStock.unit);
@@ -944,8 +1004,115 @@
             const totalPieceValue = pieces * piecePrice;
             const grandTotal = totalPackValue + totalPieceValue;
 
+            const totalPieces = (packs * piecesCount) + pieces;
+
             document.getElementById('st-total-price').textContent = grandTotal.toFixed(2) + ' ج.م';
-            document.getElementById('st-breakdown').textContent = `تفاصيل الحساب: (${packs} عبوة × ${packPrice} ج.م) + (${pieces} قطعة × ${piecePrice.toFixed(2)} ج.م)`;
+            document.getElementById('st-breakdown').textContent = `تفاصيل الحساب: (${packs} عبوة × ${packPrice} ج.م) + (${pieces} قطعة × ${piecePrice.toFixed(2)} ج.م) = ${totalPieces} قطعة إجمالية`;
+
+            return { grandTotal, totalPieces, piecePrice, packs, pieces };
+        }
+
+        // إضافة المنتج الحالي لكشف الجرد عند الضغط على زر "جرد"
+        function addCurrentProductToStockList() {
+            if (!selectedProductForStock) return;
+
+            const { grandTotal, totalPieces, piecePrice, packs, pieces } = calculateDualStockTotal();
+
+            if (grandTotal <= 0) {
+                alert('⚠️ يرجى إدخال كمية العبوات أو القطع أولاً للحساب قبل الإضافة للكشف.');
+                return;
+            }
+
+            // إضافة العنصر للقائمة
+            const stockItem = {
+                id: Date.now(),
+                productId: selectedProductForStock.id,
+                productObj: selectedProductForStock,
+                name: selectedProductForStock.name,
+                packs: packs,
+                pieces: pieces,
+                totalPieces: totalPieces,
+                piecePrice: piecePrice,
+                totalPrice: grandTotal
+            };
+
+            stockSessionList.push(stockItem);
+            renderStockListTable();
+
+            // إعادة ضبط حاسبة الجرد
+            resetStocktakingForm();
+        }
+
+        // عرض جدول كشف الجرد مع زري التعديل والحذف
+        function renderStockListTable() {
+            const tbody = document.getElementById('stock-list-tbody');
+            const grandTotalDiv = document.getElementById('stock-grand-total');
+
+            if (stockSessionList.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted);">لم يتم إضافة أي منتجات لكشف الجرد بعد.</td></tr>`;
+                grandTotalDiv.textContent = '0.00 ج.م';
+                return;
+            }
+
+            tbody.innerHTML = '';
+            let listGrandTotal = 0;
+
+            stockSessionList.forEach((item, index) => {
+                listGrandTotal += item.totalPrice;
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td><strong>${escapeHtml(item.name)}</strong></td>
+                    <td><strong>${item.totalPieces} قطعة</strong></td>
+                    <td><span class="price-badge price-piece">${item.piecePrice.toFixed(2)} ج.م</span></td>
+                    <td><strong style="color: var(--primary-color);">${item.totalPrice.toFixed(2)} ج.م</strong></td>
+                    <td>
+                        <button class="btn-edit" onclick="editStockItem(${item.id})">✏️ تعديل</button>
+                        <button class="btn-danger" onclick="removeStockItem(${item.id})">🗑️ حذف</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            grandTotalDiv.textContent = listGrandTotal.toFixed(2) + ' ج.م';
+        }
+
+        // ✨ تعديل عنصر في جدول الجرد ✨
+        async function editStockItem(id) {
+            const itemIndex = stockSessionList.findIndex(item => item.id === id);
+            if (itemIndex === -1) return;
+
+            const item = stockSessionList[itemIndex];
+            
+            // جلب أحدث بيانات المنتج
+            let productObj = item.productObj;
+            if (item.productId) {
+                const latestProduct = await getProductFromDB(item.productId);
+                if (latestProduct) productObj = latestProduct;
+            }
+
+            // حذف العنصر القديم من القائمة المؤقتة ليتحدث عند ضغط زر "جرد"
+            stockSessionList.splice(itemIndex, 1);
+            renderStockListTable();
+
+            // إعادتها للحاسبة ليتسنى للعميل كتابة الأرقام الجديدة
+            selectProductForStocktaking(productObj, item.packs || '', item.pieces || '');
+            
+            // التمرير لأعلى الشاشة نحو الحاسبة
+            window.scrollTo({ top: 300, behavior: 'smooth' });
+        }
+
+        function removeStockItem(id) {
+            stockSessionList = stockSessionList.filter(item => item.id !== id);
+            renderStockListTable();
+        }
+
+        function clearStockList() {
+            if (stockSessionList.length === 0) return;
+            if (confirm('هل أنت متأكد من مسح كشف الجرد بالكامل؟')) {
+                stockSessionList = [];
+                renderStockListTable();
+            }
         }
 
         function resetStocktakingForm() {
