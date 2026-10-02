@@ -318,7 +318,7 @@ function exportStockListToWord() {
     a.click();
 }
 
-// فتح نافذة المعاينة مع ضبط أبعاد الـ Container كاملاً ليمتد بعرض الصفحة
+// فتح نافذة المعاينة مع ضبط الأبعاد والهيكل ليتناسب 100% داخل Modal المتصفح
 function exportStockListToPDF() {
     if (!stockList || stockList.length === 0) {
         alert("كشف الجرد فارغ حالياً!");
@@ -331,35 +331,35 @@ function exportStockListToPDF() {
     const formattedTime = now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
     const rowsHTML = stockList.map((item, index) => `
-        <tr style="background-color: #ffffff !important; page-break-inside: avoid !important;">
-            <td style="border: 1px solid #000000 !important; color: #000000 !important; padding: 8px 6px; font-weight: bold; text-align: center;">${index + 1}</td>
-            <td style="border: 1px solid #000000 !important; color: #000000 !important; padding: 8px 6px; font-weight: bold; text-align: center;">${item.name}</td>
-            <td style="border: 1px solid #000000 !important; color: #000000 !important; padding: 8px 6px; text-align: center;">
+        <tr style="background-color: #ffffff !important;">
+            <td style="border: 1px solid #000000 !important; color: #000000 !important; padding: 8px 4px; font-weight: bold; text-align: center;">${index + 1}</td>
+            <td style="border: 1px solid #000000 !important; color: #000000 !important; padding: 8px 4px; font-weight: bold; text-align: center;">${item.name}</td>
+            <td style="border: 1px solid #000000 !important; color: #000000 !important; padding: 8px 4px; text-align: center;">
                 <strong style="color: #000000 !important; font-size: 13px;">${item.totalPiecesCount} قطعة</strong><br>
-                <span style="color: #694762 !important; font-size: 11px; font-weight: normal;">(${item.packQty || 0} عبوة + ${item.pieceQty || 0} قطعة)</span>
+                <span style="color: #475569 !important; font-size: 11px; font-weight: normal;">(${item.packQty || 0} عبوة + ${item.pieceQty || 0} قطعة)</span>
             </td>
-            <td style="border: 1px solid #000000 !important; color: #000000 !important; padding: 8px 6px; font-weight: bold; text-align: center;">${parseFloat(item.piecePrice).toFixed(2)} ج.م</td>
-            <td style="border: 1px solid #000000 !important; color: #0284c7 !important; padding: 8px 6px; font-weight: bold; text-align: center;">${parseFloat(item.totalPrice).toFixed(2)} ج.م</td>
+            <td style="border: 1px solid #000000 !important; color: #000000 !important; padding: 8px 4px; font-weight: bold; text-align: center;">${parseFloat(item.piecePrice).toFixed(2)} ج.م</td>
+            <td style="border: 1px solid #000000 !important; color: #0284c7 !important; padding: 8px 4px; font-weight: bold; text-align: center;">${parseFloat(item.totalPrice).toFixed(2)} ج.م</td>
         </tr>
     `).join('');
 
     const reportHTML = `
-        <div id="pdf-content-area" style="direction: rtl; text-align: right; font-family: 'Segoe UI', Arial, sans-serif; background-color: #ffffff !important; color: #000000 !important; padding: 20px; width: 100%; box-sizing: border-box;">
-            <div style="text-align: center; margin-bottom: 15px;">
+        <div id="pdf-content-area" style="direction: rtl; text-align: right; font-family: 'Segoe UI', Arial, sans-serif; background-color: #ffffff !important; color: #000000 !important; padding: 15px; width: 100%; box-sizing: border-box; margin: 0 auto;">
+            <div style="text-align: center; margin-bottom: 12px;">
                 <h2 style="margin: 0; color: #0f172a !important; font-size: 20px; font-weight: bold;">📋 تقرير كشف الجرد النهائي</h2>
                 <div style="font-size: 12px; color: #475569 !important; margin-top: 4px;">تاريخ التقرير: ${formattedDate} - ${formattedTime}</div>
             </div>
             
-            <hr style="border: none; border-top: 2px solid #0284c7; margin-bottom: 15px;">
+            <hr style="border: none; border-top: 2px solid #0284c7; margin-bottom: 12px;">
             
-            <table style="width: 100%; border-collapse: collapse; margin-bottom: 15px; background-color: #ffffff !important;">
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 12px; background-color: #ffffff !important; table-layout: fixed;">
                 <thead>
-                    <tr style="background-color: #f1f5f9 !important; page-break-inside: avoid !important;">
-                        <th style="border: 1px solid #000000 !important; color: #0284c7 !important; padding: 8px 6px; font-weight: bold; width: 6%; text-align: center;">#</th>
-                        <th style="border: 1px solid #000000 !important; color: #0284c7 !important; padding: 8px 6px; font-weight: bold; width: 34%; text-align: center;">اسم السلعة</th>
-                        <th style="border: 1px solid #000000 !important; color: #0284c7 !important; padding: 8px 6px; font-weight: bold; width: 25%; text-align: center;">إجمالي الكمية المجرودة</th>
-                        <th style="border: 1px solid #000000 !important; color: #0284c7 !important; padding: 8px 6px; font-weight: bold; width: 15%; text-align: center;">سعر القطعة</th>
-                        <th style="border: 1px solid #000000 !important; color: #0284c7 !important; padding: 8px 6px; font-weight: bold; width: 20%; text-align: center;">إجمالي السعر</th>
+                    <tr style="background-color: #f1f5f9 !important;">
+                        <th style="border: 1px solid #000000 !important; color: #0284c7 !important; padding: 8px 4px; font-weight: bold; width: 6%; text-align: center;">#</th>
+                        <th style="border: 1px solid #000000 !important; color: #0284c7 !important; padding: 8px 4px; font-weight: bold; width: 34%; text-align: center;">اسم السلعة</th>
+                        <th style="border: 1px solid #000000 !important; color: #0284c7 !important; padding: 8px 4px; font-weight: bold; width: 25%; text-align: center;">إجمالي الكمية المجرودة</th>
+                        <th style="border: 1px solid #000000 !important; color: #0284c7 !important; padding: 8px 4px; font-weight: bold; width: 15%; text-align: center;">سعر القطعة</th>
+                        <th style="border: 1px solid #000000 !important; color: #0284c7 !important; padding: 8px 4px; font-weight: bold; width: 20%; text-align: center;">إجمالي السعر</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -367,9 +367,13 @@ function exportStockListToPDF() {
                 </tbody>
             </table>
             
-            <div style="border: 2px solid #0284c7; border-radius: 6px; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; background-color: #ffffff !important; page-break-inside: avoid !important;">
-                <span style="font-weight: bold; font-size: 15px; color: #15436e !important;">إجمالي قيمة الجرد الكلية:</span>
-                <span style="font-weight: bold; font-size: 17px; color: #0284c7 !important;">${grandTotal.toFixed(2)} ج.م</span>
+            <div style="border: 2px solid #0284c7; border-radius: 6px; padding: 10px 15px; margin-top: 10px; width: 100%; box-sizing: border-box; background-color: #ffffff !important;">
+                <table style="width: 100%; border-collapse: collapse; border: none !important;">
+                    <tr style="border: none !important; background: transparent !important;">
+                        <td style="border: none !important; text-align: right; font-weight: bold; font-size: 15px; color: #0f172a !important; padding: 0;">إجمالي قيمة الجرد الكلية:</td>
+                        <td style="border: none !important; text-align: left; font-weight: bold; font-size: 17px; color: #0284c7 !important; padding: 0;">${grandTotal.toFixed(2)} ج.م</td>
+                    </tr>
+                </table>
             </div>
         </div>
     `;
@@ -380,21 +384,6 @@ function exportStockListToPDF() {
     if (modal) {
         modal.classList.add('active');
         modal.style.display = 'flex';
-
-        const modalContent = modal.querySelector('.modal-content');
-        if (modalContent) {
-            modalContent.style.width = '90%';
-            modalContent.style.maxWidth = '920px';
-            modalContent.style.overflowX = 'hidden';
-            modalContent.style.boxSizing = 'border-box';
-        }
-
-        const previewContainer = document.getElementById('report-preview-container');
-        if (previewContainer) {
-            previewContainer.style.width = '100%';
-            previewContainer.style.overflowX = 'hidden';
-            previewContainer.style.display = 'block';
-        }
     }
 }
 
@@ -435,23 +424,16 @@ function triggerPrintFromModal() {
     printWindow.document.close();
 }
 
-// الزر الثاني: تنزيل مباشر كـ PDF يملأ صفحة A4 بالكامل بدون انكماش
+// الزر الثاني: تنزيل مباشر كـ PDF
 function downloadPDFFromModal() {
     const element = document.getElementById('pdf-content-area');
-    if (!element) return;
-
+    
     const options = {
-        margin:       [10, 10, 10, 10],
+        margin:       [0.3, 0.3, 0.3, 0.3],
         filename:     `كشف_الجرد_${new Date().toLocaleDateString('ar-EG').replace(/\//g, '-')}.pdf`,
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { 
-            scale: 2, 
-            useCORS: true, 
-            logging: false, 
-            backgroundColor: '#ffffff'
-        },
-        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
-        pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
+        image:        { type: 'jpeg', quality: 1.0 },
+        html2canvas:  { scale: 2, useCORS: true, logging: false, backgroundColor: '#ffffff' },
+        jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
     };
 
     html2pdf().set(options).from(element).save();
