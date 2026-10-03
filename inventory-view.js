@@ -28,7 +28,12 @@ function renderInventoryTable() {
                 <td>${index + 1}</td>
                 <td><strong>${p.name}</strong></td>
                 <td>${p.category || '-'}</td>
-                <td>${packPrice.toFixed(2)} ج.م</td>
+                <td>
+                    ${packPrice.toFixed(2)} ج.م
+                    <small style="display: block; color: var(--text-muted); font-size: 11px;">
+                        (${p.unit || 'عبوة'})
+                    </small>
+                </td>
                 <td style="color: var(--warning-color); font-weight: bold;">${piecePriceStr}</td>
                 <td>${qty}</td>
                 <td style="color: var(--primary-color); font-weight: bold;">${totalVal} ج.م</td>
@@ -197,9 +202,175 @@ function clearAllProducts() {
     }
 }
 
+// ==========================================
+// تصدير سلع المخزن إلى Word و PDF والطباعة
+// ==========================================
+
+// 1. تصدير قائمة المخزن إلى ملف Word
+function exportInventoryToWord() {
+    const products = window.products || JSON.parse(localStorage.getItem('products') || '[]');
+    if (products.length === 0) {
+        alert("جدول المخزن فارغ حالياً!");
+        return;
+    }
+
+    let tableHTML = `
+        <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+        <head><meta charset='utf-8'><title>تقرير سلع المخزن</title></head>
+        <body dir='rtl' style='font-family: Arial;'>
+            <h2 style='text-align: center;'>تقرير سلع وبضائع المخزن الكلي</h2>
+            <table border='1' cellspacing='0' cellpadding='8' style='width: 100%; border-collapse: collapse; text-align: center;'>
+                <thead>
+                    <tr style='background-color: #f2f2f2;'>
+                        <th>#</th>
+                        <th>اسم المنتج</th>
+                        <th>التصنيف</th>
+                        <th>سعر العبوة</th>
+                        <th>سعر القطعة</th>
+                        <th>الكمية المتاحة</th>
+                        <th>القيمة الإجمالية</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+
+    let grandTotal = 0;
+    products.forEach((p, index) => {
+        const packPrice = parseFloat(p.price) || 0;
+        const qty = parseInt(p.qty) || 0;
+        const totalVal = packPrice * qty;
+        grandTotal += totalVal;
+
+        let piecePriceStr = '-';
+        if (p.piecePrice) {
+            piecePriceStr = parseFloat(p.piecePrice).toFixed(2) + ' ج.م';
+        } else if (p.piecesCount && p.piecesCount > 0) {
+            piecePriceStr = (packPrice / p.piecesCount).toFixed(2) + ' ج.م';
+        }
+
+        tableHTML += `
+            <tr>
+                <td>${index + 1}</td>
+                <td>${p.name}</td>
+                <td>${p.category || '-'}</td>
+                <td>${packPrice.toFixed(2)} ج.م<br>
+                <small style="color: #555555; font-size: 10px;">${p.unit || 'عبوة'}</small></td>
+                <td>${piecePriceStr}</td>
+                <td>${qty}</td>
+                <td>${totalVal.toFixed(2)} ج.م</td>
+            </tr>
+        `;
+    });
+
+    tableHTML += `
+                </tbody>
+            </table>
+            <h3 style='text-align: right; margin-top: 20px;'>إجمالي قيمة المخزون الكلية: ${grandTotal.toFixed(2)} ج.م</h3>
+        </body>
+        </html>
+    `;
+
+    const blob = new Blob(['\ufeff' + tableHTML], { type: 'application/msword' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `تقرير_المخزن_${new Date().toLocaleDateString('ar-EG').replace(/\//g, '-')}.doc`;
+    a.click();
+}
+
+// 2. معاينة وتصدير قائمة المخزن إلى PDF والطباعة
+function exportInventoryToPDF() {
+    const products = window.products || JSON.parse(localStorage.getItem('products') || '[]');
+    if (products.length === 0) {
+        alert("جدول المخزن فارغ حالياً!");
+        return;
+    }
+
+    let grandTotal = 0;
+    const now = new Date();
+    const formattedDate = now.toLocaleDateString('ar-EG', { year: 'numeric', month: '2-digit', day: '2-digit' });
+    const formattedTime = now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+    const rowsHTML = products.map((p, index) => {
+        const packPrice = parseFloat(p.price) || 0;
+        const qty = parseInt(p.qty) || 0;
+        const totalVal = packPrice * qty;
+        grandTotal += totalVal;
+
+        let piecePriceStr = '-';
+        if (p.piecePrice) {
+            piecePriceStr = parseFloat(p.piecePrice).toFixed(2) + ' ج.م';
+        } else if (p.piecesCount && p.piecesCount > 0) {
+            piecePriceStr = (packPrice / p.piecesCount).toFixed(2) + ' ج.م';
+        }
+
+        return `
+            <tr style="background-color: #ffffff !important; page-break-inside: avoid;">
+                <td style="border: 1px solid #000000 !important; color: #000000 !important; padding: 8px 4px; font-weight: bold; text-align: center;">${index + 1}</td>
+                <td style="border: 1px solid #000000 !important; color: #000000 !important; padding: 8px 4px; font-weight: bold; text-align: center;">${p.name}</td>
+                <td style="border: 1px solid #000000 !important; color: #000000 !important; padding: 8px 4px; text-align: center;">${p.category || '-'}</td>
+                <td style="border: 1px solid #000000 !important; color: #000000 !important; padding: 8px 4px; font-weight: bold; text-align: center;">
+                    ${packPrice.toFixed(2)} ج.م<br>
+                    <small style="color: #475569 !important; font-size: 11px; font-weight: normal;">${p.unit || 'عبوة'}</small>
+                </td>
+                <td style="border: 1px solid #000000 !important; color: #d97706 !important; padding: 8px 4px; font-weight: bold; text-align: center;">${piecePriceStr}</td>
+                <td style="border: 1px solid #000000 !important; color: #000000 !important; padding: 8px 4px; font-weight: bold; text-align: center;">${qty}</td>
+                <td style="border: 1px solid #000000 !important; color: #059669 !important; padding: 8px 4px; font-weight: bold; text-align: center;">${totalVal.toFixed(2)} ج.م</td>
+            </tr>
+        `;
+    }).join('');
+
+    const reportHTML = `
+        <div id="pdf-content-area" style="direction: rtl; text-align: right; font-family: 'Segoe UI', Arial, sans-serif; background-color: #ffffff !important; color: #000000 !important; padding: 15px; width: 100%; box-sizing: border-box; margin: 0 auto;">
+            <div style="text-align: center; margin-bottom: 12px;">
+                <h2 style="margin: 0; color: #0f172a !important; font-size: 20px; font-weight: bold;">📊 تقرير بضائع وسلع المخزن</h2>
+                <div style="font-size: 12px; color: #475569 !important; margin-top: 4px;">تاريخ التقرير: ${formattedDate} - ${formattedTime}</div>
+            </div>
+            
+            <hr style="border: none; border-top: 2px solid #10b981; margin-bottom: 12px;">
+            
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 12px; background-color: #ffffff !important; table-layout: fixed;">
+                <thead>
+                    <tr style="background-color: #f1f5f9 !important; page-break-inside: avoid;">
+                        <th style="border: 1px solid #000000 !important; color: #059669 !important; padding: 8px 4px; font-weight: bold; width: 5%; text-align: center;">#</th>
+                        <th style="border: 1px solid #000000 !important; color: #059669 !important; padding: 8px 4px; font-weight: bold; width: 25%; text-align: center;">اسم المنتج</th>
+                        <th style="border: 1px solid #000000 !important; color: #059669 !important; padding: 8px 4px; font-weight: bold; width: 18%; text-align: center;">التصنيف</th>
+                        <th style="border: 1px solid #000000 !important; color: #059669 !important; padding: 8px 4px; font-weight: bold; width: 14%; text-align: center;">سعر العبوة</th>
+                        <th style="border: 1px solid #000000 !important; color: #059669 !important; padding: 8px 4px; font-weight: bold; width: 14%; text-align: center;">سعر القطعة</th>
+                        <th style="border: 1px solid #000000 !important; color: #059669 !important; padding: 8px 4px; font-weight: bold; width: 10%; text-align: center;">الكمية</th>
+                        <th style="border: 1px solid #000000 !important; color: #059669 !important; padding: 8px 4px; font-weight: bold; width: 14%; text-align: center;">القيمة الإجمالية</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${rowsHTML}
+                </tbody>
+            </table>
+            
+            <div style="border: 2px solid #10b981; border-radius: 6px; padding: 10px 15px; margin-top: 10px; width: 100%; box-sizing: border-box; background-color: #ffffff !important; page-break-inside: avoid;">
+                <table style="width: 100%; border-collapse: collapse; border: none !important;">
+                    <tr style="border: none !important; background: transparent !important;">
+                        <td style="border: none !important; text-align: right; font-weight: bold; font-size: 15px; color: #0f172a !important; padding: 0;">إجمالي قيمة المخزون الكلية:</td>
+                        <td style="border: none !important; text-align: left; font-weight: bold; font-size: 17px; color: #059669 !important; padding: 0;">${grandTotal.toFixed(2)} ج.م</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    `;
+
+    document.getElementById('report-preview-container').innerHTML = reportHTML;
+    
+    const modal = document.getElementById('report-modal');
+    if (modal) {
+        modal.classList.add('active');
+        modal.style.display = 'flex';
+    }
+}
+
 // إتاحة الدوال للبيئة العامة
 window.renderInventoryTable = renderInventoryTable;
 window.openEditProductModal = openEditProductModal;
 window.closeEditModal = closeEditModal;
 window.deleteProduct = deleteProduct;
 window.clearAllProducts = clearAllProducts;
+window.exportInventoryToWord = exportInventoryToWord;
+window.exportInventoryToPDF = exportInventoryToPDF;

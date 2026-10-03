@@ -120,9 +120,13 @@
 
         <!-- 2. صفحة عرض المخزن -->
         <div id="inventory-page" class="page-view">
-            <div class="page-header">
+            <div class="page-header" style="flex-wrap: wrap; gap: 10px;">
                 <h2>جدول سلع المخزن بالأسعار والقطع</h2>
-                <button type="button" class="btn-danger" onclick="clearAllProducts()" style="padding: 0.5rem 1rem;">🗑 مسح كافة المنتجات</button>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    <button type="button" class="btn-export-word" onclick="exportInventoryToWord()">📄 تصدير Word</button>
+                    <button type="button" class="btn-export-pdf" onclick="exportInventoryToPDF()">🖨️ تصدير PDF / طباعة</button>
+                    <button type="button" class="btn-danger" onclick="clearAllProducts()" style="padding: 0.5rem 1rem;">🗑 مسح كافة المنتجات</button>
+                </div>
             </div>
             <div class="table-responsive">
                 <table>
@@ -288,7 +292,7 @@
     <div id="edit-stock-modal" class="modal-overlay">
         <div class="modal-card">
             <div class="modal-header">
-                <h3 style="color: var(--warning-color);">✏️ تعديل الكميات المجرودة</h3>
+                <h3 style="color: var(--warning-color);">✏️️ تعديل الكميات المجرودة</h3>
                 <button class="close-btn" onclick="closeEditStockModal()">&times;</button>
             </div>
             <form id="edit-stock-form">
@@ -320,7 +324,7 @@
 <div id="report-modal" class="modal-overlay">
     <div class="modal-card" style="max-width: 800px; width: 90%; max-height: 90vh; overflow-y: auto;">
         <div class="modal-header">
-            <h3>📊 معاينة تقرير الجرد النهائي</h3>
+            <h3>📊 معاينة التقرير والطباعة</h3>
             <button class="close-btn" onclick="closeReportModal()">&times;</button>
         </div>
         

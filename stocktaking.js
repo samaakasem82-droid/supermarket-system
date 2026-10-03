@@ -185,7 +185,7 @@ function renderStockList() {
                 <td style="color: var(--primary-color, #10b981); font-weight: bold;">${parseFloat(item.totalPrice).toFixed(2)} ج.م</td>
                 <td class="action-col">
                     <div class="table-actions" style="display: flex; gap: 5px;">
-                        <button class="btn-action-edit" onclick="openEditStockModal(${item.id})" style="padding: 4px 8px; cursor: pointer;">✏ تعديل</button>
+                        <button class="btn-action-edit" onclick="openEditStockModal(${item.id})" style="padding: 4px 8px; cursor: pointer;">✏️ تعديل</button>
                         <button class="btn-action-delete" onclick="removeStockItem(${item.id})" style="padding: 4px 8px; cursor: pointer;">🗑 حذف</button>
                     </div>
                 </td>
@@ -295,7 +295,8 @@ function exportStockListToWord() {
             <tr>
                 <td>${index + 1}</td>
                 <td>${item.name}</td>
-                <td>${item.totalPiecesCount} قطعة (${item.packQty || 0} عبوة + ${item.pieceQty || 0} قطعة)</td>
+                <td>${item.totalPiecesCount} قطعة<br>
+                <small style="color: var(--text-muted); font-size: 11px;">${item.packQty || 0} عبوة + ${item.pieceQty || 0} قطعة</small></td>
                 <td>${item.piecePrice.toFixed(2)} ج.م</td>
                 <td>${item.totalPrice.toFixed(2)} ج.م</td>
             </tr>
@@ -314,11 +315,10 @@ function exportStockListToWord() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `كشف_الجرد_${new Date().toLocaleDateString('ar-EG')}.doc`;
+    a.download = `كشف_الجرد_${new Date().toLocaleDateString('ar-EG').replace(/\//g, '-')}.doc`;
     a.click();
 }
 
-// فتح نافذة المعاينة مع ضبط الأبعاد والهيكل ليتناسب 100% داخل Modal المتصفح
 function exportStockListToPDF() {
     if (!stockList || stockList.length === 0) {
         alert("كشف الجرد فارغ حالياً!");
@@ -331,12 +331,12 @@ function exportStockListToPDF() {
     const formattedTime = now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
     const rowsHTML = stockList.map((item, index) => `
-        <tr style="background-color: #ffffff !important;">
+        <tr style="background-color: #ffffff !important; page-break-inside: avoid;">
             <td style="border: 1px solid #000000 !important; color: #000000 !important; padding: 8px 4px; font-weight: bold; text-align: center;">${index + 1}</td>
             <td style="border: 1px solid #000000 !important; color: #000000 !important; padding: 8px 4px; font-weight: bold; text-align: center;">${item.name}</td>
             <td style="border: 1px solid #000000 !important; color: #000000 !important; padding: 8px 4px; text-align: center;">
                 <strong style="color: #000000 !important; font-size: 13px;">${item.totalPiecesCount} قطعة</strong><br>
-                <span style="color: #475569 !important; font-size: 11px; font-weight: normal;">(${item.packQty || 0} عبوة + ${item.pieceQty || 0} قطعة)</span>
+                <span style="color: #475569 !important; font-size: 11px; font-weight: normal;">${item.packQty || 0} عبوة + ${item.pieceQty || 0} قطعة</span>
             </td>
             <td style="border: 1px solid #000000 !important; color: #000000 !important; padding: 8px 4px; font-weight: bold; text-align: center;">${parseFloat(item.piecePrice).toFixed(2)} ج.م</td>
             <td style="border: 1px solid #000000 !important; color: #0284c7 !important; padding: 8px 4px; font-weight: bold; text-align: center;">${parseFloat(item.totalPrice).toFixed(2)} ج.م</td>
@@ -354,7 +354,7 @@ function exportStockListToPDF() {
             
             <table style="width: 100%; border-collapse: collapse; margin-bottom: 12px; background-color: #ffffff !important; table-layout: fixed;">
                 <thead>
-                    <tr style="background-color: #f1f5f9 !important;">
+                    <tr style="background-color: #f1f5f9 !important; page-break-inside: avoid;">
                         <th style="border: 1px solid #000000 !important; color: #0284c7 !important; padding: 8px 4px; font-weight: bold; width: 6%; text-align: center;">#</th>
                         <th style="border: 1px solid #000000 !important; color: #0284c7 !important; padding: 8px 4px; font-weight: bold; width: 34%; text-align: center;">اسم السلعة</th>
                         <th style="border: 1px solid #000000 !important; color: #0284c7 !important; padding: 8px 4px; font-weight: bold; width: 25%; text-align: center;">إجمالي الكمية المجرودة</th>
@@ -367,7 +367,7 @@ function exportStockListToPDF() {
                 </tbody>
             </table>
             
-            <div style="border: 2px solid #0284c7; border-radius: 6px; padding: 10px 15px; margin-top: 10px; width: 100%; box-sizing: border-box; background-color: #ffffff !important;">
+            <div style="border: 2px solid #0284c7; border-radius: 6px; padding: 10px 15px; margin-top: 10px; width: 100%; box-sizing: border-box; background-color: #ffffff !important; page-break-inside: avoid;">
                 <table style="width: 100%; border-collapse: collapse; border: none !important;">
                     <tr style="border: none !important; background: transparent !important;">
                         <td style="border: none !important; text-align: right; font-weight: bold; font-size: 15px; color: #0f172a !important; padding: 0;">إجمالي قيمة الجرد الكلية:</td>
@@ -387,7 +387,6 @@ function exportStockListToPDF() {
     }
 }
 
-// إغلاق نافذة التقرير
 function closeReportModal() {
     const modal = document.getElementById('report-modal');
     if (modal) {
@@ -396,7 +395,6 @@ function closeReportModal() {
     }
 }
 
-// الزر الأول: طباعة عبر المتصفح
 function triggerPrintFromModal() {
     const printContent = document.getElementById('report-preview-container').innerHTML;
     const printWindow = window.open('', '_blank');
@@ -410,6 +408,7 @@ function triggerPrintFromModal() {
                 body { padding: 20px; font-family: Arial, sans-serif; background: #fff; }
                 table { width: 100%; border-collapse: collapse; }
                 th, td { border: 1px solid #000; padding: 8px; text-align: center; }
+                tr { page-break-inside: avoid; }
                 @media print { @page { size: A4; margin: 15mm; } }
             </style>
         </head>
@@ -424,19 +423,49 @@ function triggerPrintFromModal() {
     printWindow.document.close();
 }
 
-// الزر الثاني: تنزيل مباشر كـ PDF
 function downloadPDFFromModal() {
-    const element = document.getElementById('pdf-content-area');
-    
+    const originalElement = document.getElementById('pdf-content-area');
+    if (!originalElement) {
+        alert("لا يوجد محتوى لتصديره!");
+        return;
+    }
+
+    // إنشاء حاوية خفية كاملة الارتفاع لمنع تقطيع الجدول بسبب نافذة Modal Scroll
+    const tempContainer = document.createElement('div');
+    tempContainer.style.position = 'absolute';
+    tempContainer.style.left = '-9999px';
+    tempContainer.style.top = '-9999px';
+    tempContainer.style.width = '800px';
+    tempContainer.innerHTML = originalElement.outerHTML;
+    document.body.appendChild(tempContainer);
+
+    const targetElement = tempContainer.firstChild;
+
     const options = {
         margin:       [0.3, 0.3, 0.3, 0.3],
         filename:     `كشف_الجرد_${new Date().toLocaleDateString('ar-EG').replace(/\//g, '-')}.pdf`,
-        image:        { type: 'jpeg', quality: 1.0 },
-        html2canvas:  { scale: 2, useCORS: true, logging: false, backgroundColor: '#ffffff' },
-        jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { 
+            scale: 2, 
+            useCORS: true, 
+            logging: false, 
+            backgroundColor: '#ffffff',
+            scrollX: 0,
+            scrollY: 0
+        },
+        jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' },
+        pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
     };
 
-    html2pdf().set(options).from(element).save();
+    html2pdf().set(options).from(targetElement).save().then(() => {
+        document.body.removeChild(tempContainer);
+    }).catch((err) => {
+        console.error("PDF Export Error: ", err);
+        if (document.body.contains(tempContainer)) {
+            document.body.removeChild(tempContainer);
+        }
+        alert("حدث خطأ أثناء إنشاء ملف الـ PDF. يمكنك استخدام زر الطباعة وحفظ الصفحة كـ PDF بدلاً من ذلك.");
+    });
 }
 
 // ==========================================

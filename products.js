@@ -5,6 +5,30 @@ function extractPieceCount(unitStr) {
     return match ? parseInt(match[0], 10) : 1;
 }
 
+// دالة لتحديث قائمة الوحدات المقترحة (datalist) بالوحدات الجديدة
+function updateUnitsDatalist() {
+    const datalist = document.getElementById('units-list');
+    if (!datalist) return;
+
+    const products = window.products || JSON.parse(localStorage.getItem('products') || '[]');
+    
+    // الوحدات الافتراضية
+    const defaultUnits = [
+        "كرتونة 24 قطعة",
+        "كرتونة 12 قطعة",
+        "باكتة 12 قطعة",
+        "باكتة 6 قطع",
+        "علبة 10 قطع",
+        "قطعة 1"
+    ];
+
+    // استخراج كل الوحدات الفريدة المضافة سابقاً من المنتجات
+    const customUnits = products.map(p => p.unit).filter(Boolean);
+    const allUnits = [...new Set([...defaultUnits, ...customUnits])];
+
+    datalist.innerHTML = allUnits.map(unit => `<option value="${unit}">`).join('');
+}
+
 // دالة تحديث صندوق المعاينة الحسابية عند الإضافة
 function updateAddProductPreview() {
     const priceInput = document.getElementById('p-price');
@@ -30,15 +54,33 @@ function updateAddProductPreview() {
     }
 }
 
+// تعديل دالة إضافة وحدة جديدة لتعيد تشغيل الحساب الفوري وتحديث القائمة
+function promptAddNewUnit(inputId) {
+    const newUnit = prompt("أدخل مسمى الوحدة الجديدة (مثال: علبة 20 قطعة):");
+    if (newUnit) {
+        const input = document.getElementById(inputId);
+        if (input) {
+            input.value = newUnit;
+            // إطلاق حدث input لضمان إعادة حساب سعر القطعة فوراً
+            input.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+    }
+}
+
 // معالجة إضافة منتج جديد وتحديث الأحداث
 document.addEventListener('DOMContentLoaded', () => {
+    // تحديث قائمة الوحدات المقترحة فور تحميل الصفحة
+    updateUnitsDatalist();
+
     const productForm = document.getElementById('product-form');
     const priceInput = document.getElementById('p-price');
     const unitInput = document.getElementById('p-unit');
 
     if (priceInput) priceInput.addEventListener('input', updateAddProductPreview);
-    if (unitInput) unitInput.addEventListener('input', updateAddProductPreview);
-    if (unitInput) unitInput.addEventListener('change', updateAddProductPreview);
+    if (unitInput) {
+        unitInput.addEventListener('input', updateAddProductPreview);
+        unitInput.addEventListener('change', updateAddProductPreview);
+    }
     
     if (productForm) {
         productForm.addEventListener('submit', (e) => {
@@ -80,6 +122,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const calcPreview = document.getElementById('calc-preview');
             if (calcPreview) calcPreview.style.display = 'none';
 
+            // تحديث قائمة الوحدات المقترحة بالوحدة الجديدة
+            updateUnitsDatalist();
+
             // تحديث البيانات
             if (typeof updateDashboardStats === 'function') updateDashboardStats();
             if (typeof renderInventoryTable === 'function') renderInventoryTable();
@@ -106,3 +151,5 @@ function deleteProduct(id) {
 window.extractPieceCount = extractPieceCount;
 window.deleteProduct = deleteProduct;
 window.updateAddProductPreview = updateAddProductPreview;
+window.promptAddNewUnit = promptAddNewUnit;
+window.updateUnitsDatalist = updateUnitsDatalist;
